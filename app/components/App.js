@@ -15,6 +15,7 @@ class App extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInput = this.handleInput.bind(this);
         this.buildChart = this.buildChart.bind(this);
+        this.storeStockData = this.storeStockData.bind(this);
     }
 
     getData(stockSym) {
@@ -85,6 +86,7 @@ class App extends React.Component {
             this.setState({state}, () => {
                 socket.emit('stock symbols', this.state.stockSymbols);
                 socket.emit('stock dataset', this.state.dataset);
+                this.storeStockData(this.state);
                 // console.log('state after setState:', this.state);
             });
         })
@@ -117,6 +119,24 @@ class App extends React.Component {
             },
             series: series
         });
+    }
+
+    storeStockData(state) {
+        const stockSymbols = state.stockSymbols;
+        // const dataset = state.dataset;
+
+        const api_url = 'http://localhost:8080/stock';
+        const init = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                stockSymbols: stockSymbols
+                // dataset: dataset <-- Too large
+            })
+        }
+        fetch(api_url, init);
     }
 
     componentDidMount() {

@@ -26664,6 +26664,7 @@ var App = function (_React$Component) {
         _this.handleSubmit = _this.handleSubmit.bind(_this);
         _this.handleInput = _this.handleInput.bind(_this);
         _this.buildChart = _this.buildChart.bind(_this);
+        _this.storeStockData = _this.storeStockData.bind(_this);
         return _this;
     }
 
@@ -26703,7 +26704,7 @@ var App = function (_React$Component) {
                     var stockValue = d[4];
                     return [date, stockValue];
                 });
-                console.log('transformedData:', data);
+                // console.log('transformedData:', data);
                 return data.reverse();
             }
         }
@@ -26741,6 +26742,7 @@ var App = function (_React$Component) {
                 _this3.setState({ state: state }, function () {
                     socket.emit('stock symbols', _this3.state.stockSymbols);
                     socket.emit('stock dataset', _this3.state.dataset);
+                    _this3.storeStockData(_this3.state);
                     // console.log('state after setState:', this.state);
                 });
             }).catch(function (err) {
@@ -26772,6 +26774,25 @@ var App = function (_React$Component) {
                 },
                 series: series
             });
+        }
+    }, {
+        key: 'storeStockData',
+        value: function storeStockData(state) {
+            var stockSymbols = state.stockSymbols;
+            var dataset = state.dataset;
+
+            var api_url = 'http://localhost:8080/stock';
+            var init = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    stockSymbols: stockSymbols,
+                    dataset: dataset
+                })
+            };
+            fetch(api_url, init);
         }
     }, {
         key: 'componentDidMount',
