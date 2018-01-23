@@ -26665,6 +26665,7 @@ var App = function (_React$Component) {
         _this.handleInput = _this.handleInput.bind(_this);
         _this.buildChart = _this.buildChart.bind(_this);
         _this.storeStockData = _this.storeStockData.bind(_this);
+        _this.handleKeyDown = _this.handleKeyDown.bind(_this);
         return _this;
     }
 
@@ -26675,9 +26676,9 @@ var App = function (_React$Component) {
 
             // console.log('stockSym arg @ getData:', stockSym);
             var api_key = 'mx7b4emwTWnteEaLCztY';
-            var api_url = 'https://www.quandl.com/api/v3/datasets/WIKI/' + stockSym + '/data.json?api_key=';
+            var apiUrl = 'https://www.quandl.com/api/v3/datasets/WIKI/' + stockSym + '/data.json?api_key=';
 
-            return fetch(api_url + api_key).then(function (res) {
+            return fetch(apiUrl + api_key).then(function (res) {
                 return res.json();
             }).then(function (resJson) {
                 // console.log('resJson:', resJson);
@@ -26718,6 +26719,13 @@ var App = function (_React$Component) {
             });
         }
     }, {
+        key: 'handleKeyDown',
+        value: function handleKeyDown(evt) {
+            console.log('evt.key', evt.key);
+            var key = evt.key;
+            if (key === 'Enter') this.handleSubmit();
+        }
+    }, {
         key: 'handleSubmit',
         value: function handleSubmit() {
             var _this3 = this;
@@ -26742,7 +26750,7 @@ var App = function (_React$Component) {
                 _this3.setState({ state: state }, function () {
                     socket.emit('stock symbols', _this3.state.stockSymbols);
                     socket.emit('stock dataset', _this3.state.dataset);
-                    _this3.storeStockData(_this3.state);
+                    _this3.storeStockData(symbol);
                     // console.log('state after setState:', this.state);
                 });
             }).catch(function (err) {
@@ -26777,38 +26785,54 @@ var App = function (_React$Component) {
         }
     }, {
         key: 'storeStockData',
-        value: function storeStockData(state) {
-            var stockSymbols = state.stockSymbols;
-            var dataset = state.dataset;
+        value: function storeStockData(symbol) {
+            // const stockSymbols = state.stockSymbols;
+            // const dataset = state.dataset;
 
-            var api_url = 'http://localhost:8080/stock';
+            var apiUrl = 'http://localhost:8080/stock';
             var init = {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    stockSymbols: stockSymbols,
-                    dataset: dataset
+                    stockSymbol: symbol
+                    // dataset: dataset <-- Too large
                 })
             };
-            fetch(api_url, init);
+            fetch(apiUrl, init).catch(function (err) {
+                console.error(err);
+            });
+        }
+    }, {
+        key: 'getStockData',
+        value: function getStockData() {
+            var _this4 = this;
+
+            var apiUrl = 'http://localhost:8080/getstock';
+            fetch(apiUrl).then(function (res) {
+                return res.json();
+            }).then(function (resJson) {
+                return _this4.setState({ stockSymbols: resJson });
+            }).catch(function (err) {
+                console.error(err);
+            });
         }
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this4 = this;
+            var _this5 = this;
 
             var socket = (0, _socket2.default)();
 
             socket.on('stock symbols', function (symbols) {
-                return _this4.setState({ stockSymbols: symbols });
+                return _this5.setState({ stockSymbols: symbols });
             });
             socket.on('stock dataset', function (dataset) {
 
-                var stockSymbols = _this4.state.stockSymbols;
-                _this4.setState({ dataset: dataset });
-                _this4.buildChart(chartContainer, dataset, stockSymbols);
+                var stockSymbols = _this5.state.stockSymbols;
+                _this5.setState({ dataset: dataset });
+                _this5.buildChart(chartContainer, dataset, stockSymbols);
                 // console.log('setState @ compDidMnt:', this.state);
             });
             var chartContainer = document.querySelector('.chart-container');
@@ -26825,6 +26849,7 @@ var App = function (_React$Component) {
             var handleSubmit = this.handleSubmit;
             var handleInput = this.handleInput;
             var stockSymbols = this.state.stockSymbols;
+            var handleKeyDown = this.handleKeyDown;
 
             return _react2.default.createElement(
                 'div',
@@ -26838,7 +26863,7 @@ var App = function (_React$Component) {
                 _react2.default.createElement(
                     'div',
                     { className: 'search-bar' },
-                    _react2.default.createElement('input', { onChange: handleInput, type: 'text', placeholder: 'APPL' }),
+                    _react2.default.createElement('input', { onChange: handleInput, onKeyDown: handleKeyDown, type: 'text', placeholder: 'APPL' }),
                     _react2.default.createElement(
                         'button',
                         { onClick: handleSubmit },

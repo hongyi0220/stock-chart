@@ -14,7 +14,20 @@ app.use(bodyParser.json());
 
 app.use(express.static('build'));
 
-app.get('/stock', (req, res) => {
+app.get('/getstock', (req, res) => {
+    MongoClient.connect(dbUrl, (err, db) => {
+        if (err) console.error(err);
+        db.collection('stockdata').find({})
+        .toArray((err, data) => {
+            if (err) console.error(err);
+            console.log('data @ "/getstock":', data);
+            res.send(data);
+            db.close();
+        });
+    });
+});
+
+app.post('/stock', (req, res) => {
     MongoClient.connect(dbUrl, (err, db) => {
         if (err) console.error(err);
         const collection = db.collection('stockdata');
@@ -22,24 +35,24 @@ app.get('/stock', (req, res) => {
         .toArray((err, data) => {
             if (err) console.error(err);
 
-            const stockSymbols = req.body.stockSymbols;
-            const stockData = req.body.dataset;
-            const dataset = [stockSymbols, stockData];
-
-            console.log('dataset @server "/stock"', dataset);
+            const symbol = req.body.stockSymbol;
+            const schema = {
+                stockSymbols: [symbol]
+            }
+            console.log('stockSymbols @ server:', symbol);
             if (data.length) {
-
+                console.log('data exists, updating..');
                 collection.updateOne(
                     {},// Update first doc found
-                    {$set: {
-                        dataset: dataset
-                    }}
+                    {$push: {stockSymbols: symbol}}
                 );
             } else {
-                collection.insert(dataset);
+                console.log('data doesn\'t exist, inserting..');
+                collection.insert(schema);
             }
+            db.close();
+            res.end();
         });
-        db.close();
     });
 });
 
