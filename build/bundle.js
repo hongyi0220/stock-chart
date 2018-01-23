@@ -26658,39 +26658,42 @@ var App = function (_React$Component) {
 
         _this.state = {
             input: null,
-            dataset: [],
-            stockSymbols: []
+            stockData: [],
+            stockSymbols: [],
+            packaged: null
         };
         _this.handleSubmit = _this.handleSubmit.bind(_this);
         _this.handleInput = _this.handleInput.bind(_this);
         _this.buildChart = _this.buildChart.bind(_this);
         _this.storeStockData = _this.storeStockData.bind(_this);
         _this.handleKeyDown = _this.handleKeyDown.bind(_this);
+        _this.packageData = _this.packageData.bind(_this);
+        _this.unpackData = _this.unpackData.bind(_this);
         return _this;
     }
 
     _createClass(App, [{
         key: 'getData',
-        value: function getData(stockSym) {
+        value: function getData(stockSymbol) {
             var _this2 = this;
 
             // console.log('stockSym arg @ getData:', stockSym);
             var api_key = 'mx7b4emwTWnteEaLCztY';
-            var apiUrl = 'https://www.quandl.com/api/v3/datasets/WIKI/' + stockSym + '/data.json?api_key=';
+            var apiUrl = 'https://www.quandl.com/api/v3/datasets/WIKI/' + stockSymbol + '/data.json?api_key=';
 
             return fetch(apiUrl + api_key).then(function (res) {
                 return res.json();
             }).then(function (resJson) {
                 // console.log('resJson:', resJson);
                 var state = _extends({}, _this2.state);
-                var dataset = state.dataset;
+                var stockData = state.stockData;
 
                 if (resJson['quandl_error']) {
                     throw new Error(resJson['quandl_error'].message);
                 }
                 var transformedData = transformData(resJson);
 
-                dataset.push(transformedData);
+                stockData.push(transformedData);
                 _this2.setState({ state: state /*, () => console.log('state after setState @ getData:', this.state)*/ });
                 return transformedData;
             }).catch(function (err) {
@@ -26743,49 +26746,86 @@ var App = function (_React$Component) {
                 }
                 return false;
             }
-            this.getData(symbol).then(function (result) {
+            this.getData(symbol).then(function (stockDatum) {
                 // console.log('result:', result);
                 // console.log('!hasSymbol:', !hasSymbol(symbol));
-                if (!hasSymbol(symbol) && result) stockSymbols.push(symbol);
-                _this3.setState({ state: state }, function () {
-                    socket.emit('stock symbols', _this3.state.stockSymbols);
-                    socket.emit('stock dataset', _this3.state.dataset);
-                    _this3.storeStockData(symbol);
-                    // console.log('state after setState:', this.state);
-                });
+                if (!hasSymbol(symbol) && stockDatum) {
+                    var packaged = _this3.packageData(symbol, stockDatum);
+                    // state.package = package;
+                    stockSymbols.push(symbol);
+                    _this3.setState({ state: state }, function () {
+                        socket.emit('stock symbols', _this3.state.stockSymbols);
+                        socket.emit('stock data', _this3.state.stockData);
+                        _this3.storeStockData(packaged);
+                        // console.log('state after setState:', this.state);
+                    });
+                }
             }).catch(function (err) {
                 console.log(err);
             });
         }
     }, {
         key: 'buildChart',
-        value: function buildChart(where, dataset, stockSymbols) {
-            var series = [];
+        value: function buildChart(where) {
 
-            for (var i = 0; i < stockSymbols.length; i++) {
-                var datum = {
-                    name: stockSymbols[i],
-                    data: dataset[i],
-                    tooltip: {
-                        valueDecimals: 2
-                    }
-                };
-                series.push(datum);
-            }
+            // A function that uses closure
+            return function build(stockData, stockSymbols) {
+                var series = [];
 
-            var highcharts = new _highstock2.default.stockChart(where, {
-                rangeSelector: {
-                    selected: 1
-                },
-                title: {
-                    text: 'Stock'
-                },
-                series: series
+                for (var i = 0; i < stockSymbols.length; i++) {
+                    var dataset = {
+                        name: stockSymbols[i],
+                        data: stockData[i],
+                        tooltip: {
+                            valueDecimals: 2
+                        }
+                    };
+                    series.push(dataset);
+                }
+
+                var highcharts = new _highstock2.default.stockChart(where, {
+                    rangeSelector: {
+                        selected: 1
+                    },
+                    title: {
+                        text: 'Stock'
+                    },
+                    series: series
+                });
+            };
+        }
+    }, {
+        key: 'packageData',
+        value: function packageData(symbol, stockDatum) {
+            var packaged = {
+                stockSymbol: symbol,
+                stockDatum: stockDatum
+            };
+            return packaged;
+        }
+    }, {
+        key: 'unpackData',
+        value: function unpackData(data, fn) {
+            var _this4 = this;
+
+            var stockSymbols = [];
+            var stockData = [];
+            data.forEach(function (d) {
+                stockSymbols.push(d.stockSymbol);
+                stockData.push(d.stockDatum);
+            });
+            this.setState({
+                stockSymbols: stockSymbols,
+                stockData: stockData
+            }, function () {
+                // This fn already has chartContainer passed-in as an argument
+                if (fn) fn(stockData, stockSymbols);
+                console.log('state after unpacking:', _this4.state);
             });
         }
     }, {
         key: 'storeStockData',
-        value: function storeStockData(symbol) {
+        value: function storeStockData(packaged) {
             // const stockSymbols = state.stockSymbols;
             // const dataset = state.dataset;
 
@@ -26796,8 +26836,9 @@ var App = function (_React$Component) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    stockSymbol: symbol
-                    // dataset: dataset <-- Too large
+                    packaged: packaged
+                    // stockSymbol: symbol,
+                    // dataset: dataset
                 })
             };
             fetch(apiUrl, init).catch(function (err) {
@@ -26807,42 +26848,86 @@ var App = function (_React$Component) {
     }, {
         key: 'getStockData',
         value: function getStockData() {
-            var _this4 = this;
-
+            console.log('getStockData triggered');
             var apiUrl = 'http://localhost:8080/getstock';
-            fetch(apiUrl).then(function (res) {
+            return fetch(apiUrl).then(function (res) {
                 return res.json();
-            }).then(function (resJson) {
-                return _this4.setState({ stockSymbols: resJson });
+            })
+            // .then(resJson => this.setState({stockSymbols: resJson}))
+            .then(function (resJson) {
+                return resJson;
             }).catch(function (err) {
                 console.error(err);
             });
         }
+
+        // componentWillMount() {
+        //     console.log('componentWillMount');
+        //     // this.getStockData()
+        //     // .then(packaged => this.unpackData(packaged))
+        //     // .catch(err => console.error(err));
+        // }
+
+
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
             var _this5 = this;
 
+            console.log('componentDidMount');
             var socket = (0, _socket2.default)();
+            // console.log('socket:', socket);
+            var chartContainer = document.querySelector('.chart-container');
 
             socket.on('stock symbols', function (symbols) {
                 return _this5.setState({ stockSymbols: symbols });
             });
-            socket.on('stock dataset', function (dataset) {
+            socket.on('stock data', function (stockData) {
 
                 var stockSymbols = _this5.state.stockSymbols;
-                _this5.setState({ dataset: dataset });
-                _this5.buildChart(chartContainer, dataset, stockSymbols);
+                _this5.setState({ stockData: stockData });
+                var build = _this5.buildChart(chartContainer);
+                // Using inner function's closure over the argument chartContainer
+                build(stockData, stockSymbols);
                 // console.log('setState @ compDidMnt:', this.state);
             });
-            var chartContainer = document.querySelector('.chart-container');
+
             var state = _extends({}, this.state);
             // console.log('{...this.state} @ compDidMnt:', state);
             var stockSymbols = state.stockSymbols;
-            var dataset = state.dataset;
+            var stockData = state.stockData;
+
+            // Code below ensures if user is reloading page or visiting the page for the first time,
+            // previous searched stock info is retrieved and displayed
+            if (localStorage) {
+                console.log('has localStorage');
+                var visited = localStorage.getItem('visited');
+                if (!visited) {
+                    console.log('first time visit');
+                    localStorage.setItem('visited', 'true');
+                    console.log('stockData, stockSymbols:', stockData, stockSymbols);
+                    this.getStockData().then(function (packaged) {
+                        var build = _this5.buildChart(chartContainer);
+                        // console.log('does chartContainer exist inside the scope of a promise?:', chartContainer);
+                        _this5.unpackData(packaged, build);
+                    }).catch(function (err) {
+                        return console.error(err);
+                    });
+                }
+            }
+
+            window.onbeforeunload = function () {
+                localStorage.removeItem('visited');
+            };
 
             // this.buildChart(chartContainer, dataset, stockSymbols);
         }
+
+        // componentWillUnmount() {
+        //     console.log('componentWillUnmount triggered');
+        //     if (localStorage) localStorage.clear();
+        // }
+
     }, {
         key: 'render',
         value: function render() {
