@@ -1,21 +1,36 @@
 * {
   box-sizing: border-box; }
 
-.chart-container {
+.app-container .chart-container {
   width: 400px;
   height: 400px; }
 
-.transition-wrapper {
+.app-container .transition-wrapper {
   display: inline-block;
+  margin: 0.2em;
   width: 100px;
   height: 50px; }
-  .transition-wrapper .card-wrapper {
+  .app-container .transition-wrapper .card-wrapper {
+    position: relative;
     border: 1px solid black;
+    border-radius: 2px;
     width: 100px;
     height: 50px; }
-    .transition-wrapper .card-wrapper .stock-card {
+    .app-container .transition-wrapper .card-wrapper .stock-card {
       border-left: 3px solid green;
       width: 100px;
       height: 50px; }
-      .transition-wrapper .card-wrapper .stock-card:hover {
+      .app-container .transition-wrapper .card-wrapper .stock-card:hover {
         border-left: 3px solid red; }
+    .app-container .transition-wrapper .card-wrapper .icon {
+      position: absolute;
+      top: 0;
+      right: 0; }
+      .app-container .transition-wrapper .card-wrapper .icon:hover {
+        cursor: pointer; }
+
+.app-container .search-container input {
+  border: 1px solid #2db84b;
+  height: 41.1px;
+  border-radius: 5px;
+  margin-right: 0.2em; }

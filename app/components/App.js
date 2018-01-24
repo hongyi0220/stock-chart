@@ -2,7 +2,7 @@ import React from 'react';
 import { withRouter, Route, Switch } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 import Highcharts from 'highcharts/highstock';
-import {Transition} from 'semantic-ui-react';
+import { Button, Transition, Icon } from 'semantic-ui-react';
 
 class App extends React.Component {
     constructor() {
@@ -21,6 +21,7 @@ class App extends React.Component {
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.packageData = this.packageData.bind(this);
         this.unpackData = this.unpackData.bind(this);
+        this.removeStock = this.removeStock.bind(this);
     }
 
     getData(stockSymbol) {
@@ -157,14 +158,21 @@ class App extends React.Component {
             stockSymbols.push(d.stockSymbol);
             stockData.push(d.stockDatum);
         });
-        this.setState({
-            stockSymbols: stockSymbols,
-            stockData: stockData
-        }, () => {
-            // This fn already has chartContainer passed-in as an argument
-            if (fn) fn(stockData, stockSymbols);
-            console.log('state after unpacking:', this.state)
-        });
+        if (!stockSymbols.length) {
+            const placeholderSymbol = ['EXMPL'];
+            const placeholderData = [ [[1395878400000,388.46],[1395964800000,459.99],[1396224000000,556.97],[1396310400000,367.16],[1396396800000,567],[1396483200000,369.74],[1396569600000,443.14],[1396828800000,538.15],[1396915200000,554.9],[1397001600000,664.14]] ];
+        if (fn) fn(placeholderData, placeholderSymbol);
+        } else {
+            this.setState({
+                stockSymbols: stockSymbols,
+                stockData: stockData
+            }, () => {
+                // This fn already has chartContainer passed-in as an argument
+                if (fn) fn(stockData, stockSymbols);
+                console.log('state after unpacking:', this.state)
+            });
+        }
+
     }
 
     storeStockData(packaged) {
@@ -201,13 +209,24 @@ class App extends React.Component {
         });
     }
 
-    // componentWillMount() {
-    //     console.log('componentWillMount');
-    //     // this.getStockData()
-    //     // .then(packaged => this.unpackData(packaged))
-    //     // .catch(err => console.error(err));
-    // }
+    removeStock(evt) {
 
+        const symbol = evt.target.id;
+        const queryString = '?symbol=' + symbol.toLowerCase();
+        const apiUrl = 'http://localhost:8080/remove';
+        // const testUrl = 'http://localhost:8080/remove/:symbol=fb';
+        console.log('removeStock:', symbol);
+        fetch(apiUrl + queryString)
+        // fetch(testUrl)
+        .catch(err => console.error(err));
+        const state = {...this.state};
+        let stockSymbols = state.stockSymbols;
+        let stockData = state.stockData;
+        const stockSymbolIndex = stockSymbols.indexOf(symbol);
+        stockSymbols.splice(stockSymbolIndex, 1);
+        stockData.splice(stockSymbolIndex, 1);
+        this.setState({ state }, () => console.log('state after removeStock:', this.state)); 
+    }
 
     componentDidMount() {
         console.log('componentDidMount');
@@ -234,12 +253,12 @@ class App extends React.Component {
         // Code below ensures if user is reloading page or visiting the page for the first time,
         // previous searched stock info is retrieved and displayed
         if (localStorage) {
-            console.log('has localStorage');
+            // console.log('has localStorage');
             const visited = localStorage.getItem('visited');
             if (!visited) {
-                console.log('first time visit');
+                // console.log('first time visit');
                 localStorage.setItem('visited', 'true');
-                console.log('stockData, stockSymbols:', stockData, stockSymbols);
+                // console.log('stockData, stockSymbols:', stockData, stockSymbols);
                 this.getStockData()
                 .then(packaged => {
                     const build = this.buildChart(chartContainer);
@@ -255,14 +274,7 @@ class App extends React.Component {
             localStorage.removeItem('visited');
         }
 
-
-        // this.buildChart(chartContainer, dataset, stockSymbols);
     }
-
-    // componentWillUnmount() {
-    //     console.log('componentWillUnmount triggered');
-    //     if (localStorage) localStorage.clear();
-    // }
 
     render() {
         const handleSubmit = this.handleSubmit;
@@ -270,30 +282,31 @@ class App extends React.Component {
         const stockSymbols = this.state.stockSymbols;
         const handleKeyDown = this.handleKeyDown;
         const value = this.state.input;
+        const removeStock = this.removeStock;
 
         return (
             <div className='app-container'>
                 <div className='chart-container'></div>
 
                 <div className='cards-container'>
-                    {/* {stockSymbols.map((s,i) => {
-                        return (<div key={i} className='stock-card'>
-                            {s}
-                        </div>)
-                    })} */}
-                    {stockSymbols.map((s, i) => {
+                    {/* <div className='card-wrapper'>
+                        <div className='stock-card'>{'hi'}</div>
+                        <Icon className='icon' color='grey' name='delete'></Icon>
+                    </div> */}
+                    {stockSymbols.map((sym, i) => {
                         return (<div key={i} className='transition-wrapper'>
-                            <Transition animation='fade up' duration={1000} transitionOnMount={true} >
+                            <Transition animation='fade up' duration={800} transitionOnMount={true} >
                                 <div className='card-wrapper'>
-                                    <div className='stock-card'>{s}</div>
+                                    <div className='stock-card'>{sym}</div>
+                                    <Icon onClick={removeStock} id={sym} className='icon' color='grey' name='delete'></Icon>
                                 </div>
                             </Transition>
                         </div>)
                     })}
                 </div>
-                <div className='search-bar'>
+                <div className='search-container'>
                     <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='AAPL' value={value}/>
-                    <button onClick={handleSubmit}>Add</button>
+                    <Button basic color='green' onClick={handleSubmit}>Add</Button>
                 </div>
             </div>
         );

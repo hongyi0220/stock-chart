@@ -45963,6 +45963,7 @@ var App = function (_React$Component) {
         _this.handleKeyDown = _this.handleKeyDown.bind(_this);
         _this.packageData = _this.packageData.bind(_this);
         _this.unpackData = _this.unpackData.bind(_this);
+        _this.removeStock = _this.removeStock.bind(_this);
         return _this;
     }
 
@@ -46109,14 +46110,20 @@ var App = function (_React$Component) {
                 stockSymbols.push(d.stockSymbol);
                 stockData.push(d.stockDatum);
             });
-            this.setState({
-                stockSymbols: stockSymbols,
-                stockData: stockData
-            }, function () {
-                // This fn already has chartContainer passed-in as an argument
-                if (fn) fn(stockData, stockSymbols);
-                console.log('state after unpacking:', _this4.state);
-            });
+            if (!stockSymbols.length) {
+                var placeholderSymbol = ['EXMPL'];
+                var placeholderData = [[[1395878400000, 388.46], [1395964800000, 459.99], [1396224000000, 556.97], [1396310400000, 367.16], [1396396800000, 567], [1396483200000, 369.74], [1396569600000, 443.14], [1396828800000, 538.15], [1396915200000, 554.9], [1397001600000, 664.14]]];
+                if (fn) fn(placeholderData, placeholderSymbol);
+            } else {
+                this.setState({
+                    stockSymbols: stockSymbols,
+                    stockData: stockData
+                }, function () {
+                    // This fn already has chartContainer passed-in as an argument
+                    if (fn) fn(stockData, stockSymbols);
+                    console.log('state after unpacking:', _this4.state);
+                });
+            }
         }
     }, {
         key: 'storeStockData',
@@ -46155,19 +46162,35 @@ var App = function (_React$Component) {
                 console.error(err);
             });
         }
+    }, {
+        key: 'removeStock',
+        value: function removeStock(evt) {
+            var _this5 = this;
 
-        // componentWillMount() {
-        //     console.log('componentWillMount');
-        //     // this.getStockData()
-        //     // .then(packaged => this.unpackData(packaged))
-        //     // .catch(err => console.error(err));
-        // }
-
-
+            var symbol = evt.target.id;
+            var queryString = '?symbol=' + symbol.toLowerCase();
+            var apiUrl = 'http://localhost:8080/remove';
+            // const testUrl = 'http://localhost:8080/remove/:symbol=fb';
+            console.log('removeStock:', symbol);
+            fetch(apiUrl + queryString)
+            // fetch(testUrl)
+            .catch(function (err) {
+                return console.error(err);
+            });
+            var state = _extends({}, this.state);
+            var stockSymbols = state.stockSymbols;
+            var stockData = state.stockData;
+            var stockSymbolIndex = stockSymbols.indexOf(symbol);
+            stockSymbols.splice(stockSymbolIndex, 1);
+            stockData.splice(stockSymbolIndex, 1);
+            this.setState({ state: state }, function () {
+                return console.log('state after removeStock:', _this5.state);
+            });
+        }
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this5 = this;
+            var _this6 = this;
 
             console.log('componentDidMount');
             var socket = (0, _socket2.default)();
@@ -46175,13 +46198,13 @@ var App = function (_React$Component) {
             var chartContainer = document.querySelector('.chart-container');
 
             socket.on('stock symbols', function (symbols) {
-                return _this5.setState({ stockSymbols: symbols });
+                return _this6.setState({ stockSymbols: symbols });
             });
             socket.on('stock data', function (stockData) {
 
-                var stockSymbols = _this5.state.stockSymbols;
-                _this5.setState({ stockData: stockData });
-                var build = _this5.buildChart(chartContainer);
+                var stockSymbols = _this6.state.stockSymbols;
+                _this6.setState({ stockData: stockData });
+                var build = _this6.buildChart(chartContainer);
                 // Using inner function's closure over the argument chartContainer
                 build(stockData, stockSymbols);
                 // console.log('setState @ compDidMnt:', this.state);
@@ -46195,16 +46218,16 @@ var App = function (_React$Component) {
             // Code below ensures if user is reloading page or visiting the page for the first time,
             // previous searched stock info is retrieved and displayed
             if (localStorage) {
-                console.log('has localStorage');
+                // console.log('has localStorage');
                 var visited = localStorage.getItem('visited');
                 if (!visited) {
-                    console.log('first time visit');
+                    // console.log('first time visit');
                     localStorage.setItem('visited', 'true');
-                    console.log('stockData, stockSymbols:', stockData, stockSymbols);
+                    // console.log('stockData, stockSymbols:', stockData, stockSymbols);
                     this.getStockData().then(function (packaged) {
-                        var build = _this5.buildChart(chartContainer);
+                        var build = _this6.buildChart(chartContainer);
                         // console.log('does chartContainer exist inside the scope of a promise?:', chartContainer);
-                        _this5.unpackData(packaged, build);
+                        _this6.unpackData(packaged, build);
                     }).catch(function (err) {
                         return console.error(err);
                     });
@@ -46214,15 +46237,7 @@ var App = function (_React$Component) {
             window.onbeforeunload = function () {
                 localStorage.removeItem('visited');
             };
-
-            // this.buildChart(chartContainer, dataset, stockSymbols);
         }
-
-        // componentWillUnmount() {
-        //     console.log('componentWillUnmount triggered');
-        //     if (localStorage) localStorage.clear();
-        // }
-
     }, {
         key: 'render',
         value: function render() {
@@ -46231,6 +46246,7 @@ var App = function (_React$Component) {
             var stockSymbols = this.state.stockSymbols;
             var handleKeyDown = this.handleKeyDown;
             var value = this.state.input;
+            var removeStock = this.removeStock;
 
             return _react2.default.createElement(
                 'div',
@@ -46239,21 +46255,22 @@ var App = function (_React$Component) {
                 _react2.default.createElement(
                     'div',
                     { className: 'cards-container' },
-                    stockSymbols.map(function (s, i) {
+                    stockSymbols.map(function (sym, i) {
                         return _react2.default.createElement(
                             'div',
                             { key: i, className: 'transition-wrapper' },
                             _react2.default.createElement(
                                 _semanticUiReact.Transition,
-                                { animation: 'fade up', duration: 1000, transitionOnMount: true },
+                                { animation: 'fade up', duration: 800, transitionOnMount: true },
                                 _react2.default.createElement(
                                     'div',
                                     { className: 'card-wrapper' },
                                     _react2.default.createElement(
                                         'div',
                                         { className: 'stock-card' },
-                                        s
-                                    )
+                                        sym
+                                    ),
+                                    _react2.default.createElement(_semanticUiReact.Icon, { onClick: removeStock, id: sym, className: 'icon', color: 'grey', name: 'delete' })
                                 )
                             )
                         );
@@ -46261,11 +46278,11 @@ var App = function (_React$Component) {
                 ),
                 _react2.default.createElement(
                     'div',
-                    { className: 'search-bar' },
+                    { className: 'search-container' },
                     _react2.default.createElement('input', { onChange: handleInput, onKeyDown: handleKeyDown, type: 'text', placeholder: 'AAPL', value: value }),
                     _react2.default.createElement(
-                        'button',
-                        { onClick: handleSubmit },
+                        _semanticUiReact.Button,
+                        { basic: true, color: 'green', onClick: handleSubmit },
                         'Add'
                     )
                 )

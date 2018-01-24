@@ -14,6 +14,20 @@ app.use(bodyParser.json({ limit: '50mb' }));
 
 app.use(express.static('build'));
 
+app.get('/remove', (req, res) => {
+
+    const query = req.query;
+    const symbol = query.symbol.toUpperCase();
+    console.log('query:', query);
+    MongoClient.connect(dbUrl, (err, db) => {
+        if (err) console.error(err);
+        db.collection('stockdata')
+        .deleteOne({stockSymbol: symbol});
+        db.close();
+        res.end();
+    });
+});
+
 app.get('/getstock', (req, res) => {
     MongoClient.connect(dbUrl, (err, db) => {
         if (err) console.error(err);
