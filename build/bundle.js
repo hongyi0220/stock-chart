@@ -46172,6 +46172,7 @@ var App = function (_React$Component) {
         value: function removeStock(evt) {
             var _this5 = this;
 
+            var socket = (0, _socket2.default)();
             var symbol = evt.target.id;
             var queryString = '?symbol=' + symbol.toLowerCase();
             var apiUrl = 'http://localhost:8080/remove';
@@ -46189,7 +46190,9 @@ var App = function (_React$Component) {
             stockSymbols.splice(stockSymbolIndex, 1);
             stockData.splice(stockSymbolIndex, 1);
             this.setState({ state: state }, function () {
-                return console.log('state after removeStock:', _this5.state);
+                console.log('state after removeStock:', _this5.state);
+                socket.emit('stock symbols', _this5.state.stockSymbols);
+                socket.emit('stock data', _this5.state.stockData);
             });
             this.buildChart(document.querySelector('.chart-container'))();
         }

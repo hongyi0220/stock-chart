@@ -212,7 +212,7 @@ class App extends React.Component {
     }
 
     removeStock(evt) {
-
+        const socket = socketIOClient();
         const symbol = evt.target.id;
         const queryString = '?symbol=' + symbol.toLowerCase();
         const apiUrl = 'http://localhost:8080/remove';
@@ -227,7 +227,11 @@ class App extends React.Component {
         const stockSymbolIndex = stockSymbols.indexOf(symbol);
         stockSymbols.splice(stockSymbolIndex, 1);
         stockData.splice(stockSymbolIndex, 1);
-        this.setState({ state }, () => console.log('state after removeStock:', this.state));
+        this.setState({ state }, () => {
+            console.log('state after removeStock:', this.state);
+            socket.emit('stock symbols', this.state.stockSymbols);
+            socket.emit('stock data', this.state.stockData);
+        });
         this.buildChart(document.querySelector('.chart-container'))();
     }
 
