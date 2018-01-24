@@ -2,13 +2,14 @@ import React from 'react';
 import { withRouter, Route, Switch } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 import Highcharts from 'highcharts/highstock';
+import {Transition} from 'semantic-ui-react';
 
 class App extends React.Component {
     constructor() {
         super();
 
         this.state = {
-            input: null,
+            input: '',
             stockData: [],
             stockSymbols: [],
             packaged: null
@@ -69,7 +70,7 @@ class App extends React.Component {
     }
 
     handleKeyDown(evt) {
-        console.log('evt.key', evt.key);
+        // console.log('evt.key', evt.key);
         const key = evt.key;
         if (key === 'Enter') this.handleSubmit();
     }
@@ -88,6 +89,7 @@ class App extends React.Component {
             }
             return false;
         }
+        this.setState({ input: '' });
         this.getData(symbol)
         .then(stockDatum => {
             // console.log('result:', result);
@@ -96,7 +98,7 @@ class App extends React.Component {
                 const packaged = this.packageData(symbol, stockDatum);
                 // state.package = package;
                 stockSymbols.push(symbol);
-                this.setState({state}, () => {
+                this.setState({ state }, () => {
                     socket.emit('stock symbols', this.state.stockSymbols);
                     socket.emit('stock data', this.state.stockData);
                     this.storeStockData(packaged);
@@ -267,13 +269,30 @@ class App extends React.Component {
         const handleInput = this.handleInput;
         const stockSymbols = this.state.stockSymbols;
         const handleKeyDown = this.handleKeyDown;
+        const value = this.state.input;
 
         return (
             <div className='app-container'>
                 <div className='chart-container'></div>
-                <div className='cards-container'>Stock cards go here</div>
+
+                <div className='cards-container'>
+                    {/* {stockSymbols.map((s,i) => {
+                        return (<div key={i} className='stock-card'>
+                            {s}
+                        </div>)
+                    })} */}
+                    {stockSymbols.map((s, i) => {
+                        return (<div key={i} className='transition-wrapper'>
+                            <Transition animation='fade up' duration={1000} transitionOnMount={true} >
+                                <div className='card-wrapper'>
+                                    <div className='stock-card'>{s}</div>
+                                </div>
+                            </Transition>
+                        </div>)
+                    })}
+                </div>
                 <div className='search-bar'>
-                    <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='APPL'/>
+                    <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='AAPL' value={value}/>
                     <button onClick={handleSubmit}>Add</button>
                 </div>
             </div>

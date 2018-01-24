@@ -20,7 +20,7 @@ app.get('/getstock', (req, res) => {
         db.collection('stockdata').find({})
         .toArray((err, data) => {
             if (err) console.error(err);
-            console.log('data @ "/getstock":', data);
+            // console.log('data @ "/getstock":', data);
             res.send(data);
             db.close();
         });

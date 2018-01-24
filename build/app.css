@@ -1,3 +1,21 @@
+* {
+  box-sizing: border-box; }
+
 .chart-container {
   width: 400px;
   height: 400px; }
+
+.transition-wrapper {
+  display: inline-block;
+  width: 100px;
+  height: 50px; }
+  .transition-wrapper .card-wrapper {
+    border: 1px solid black;
+    width: 100px;
+    height: 50px; }
+    .transition-wrapper .card-wrapper .stock-card {
+      border-left: 3px solid green;
+      width: 100px;
+      height: 50px; }
+      .transition-wrapper .card-wrapper .stock-card:hover {
+        border-left: 3px solid red; }
