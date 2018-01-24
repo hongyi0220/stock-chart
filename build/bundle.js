@@ -45964,6 +45964,7 @@ var App = function (_React$Component) {
         _this.packageData = _this.packageData.bind(_this);
         _this.unpackData = _this.unpackData.bind(_this);
         _this.removeStock = _this.removeStock.bind(_this);
+
         return _this;
     }
 
@@ -46063,9 +46064,13 @@ var App = function (_React$Component) {
     }, {
         key: 'buildChart',
         value: function buildChart(where) {
-
+            var defaultData = this.state.stockData;
+            var defaultSymbols = this.state.stockSymbols;
             // A function that uses closure
-            return function build(stockData, stockSymbols) {
+            return function build() {
+                var stockData = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : defaultData;
+                var stockSymbols = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultSymbols;
+
                 var series = [];
 
                 for (var i = 0; i < stockSymbols.length; i++) {
@@ -46106,9 +46111,9 @@ var App = function (_React$Component) {
 
             var stockSymbols = [];
             var stockData = [];
-            data.forEach(function (d) {
-                stockSymbols.push(d.stockSymbol);
-                stockData.push(d.stockDatum);
+            data.forEach(function (datum) {
+                stockSymbols.push(datum.stockSymbol);
+                stockData.push(datum.stockDatum);
             });
             if (!stockSymbols.length) {
                 var placeholderSymbol = ['EXMPL'];
@@ -46186,6 +46191,7 @@ var App = function (_React$Component) {
             this.setState({ state: state }, function () {
                 return console.log('state after removeStock:', _this5.state);
             });
+            this.buildChart(document.querySelector('.chart-container'))();
         }
     }, {
         key: 'componentDidMount',

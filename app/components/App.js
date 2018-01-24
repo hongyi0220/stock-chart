@@ -22,6 +22,7 @@ class App extends React.Component {
         this.packageData = this.packageData.bind(this);
         this.unpackData = this.unpackData.bind(this);
         this.removeStock = this.removeStock.bind(this);
+
     }
 
     getData(stockSymbol) {
@@ -114,9 +115,10 @@ class App extends React.Component {
     }
 
     buildChart(where) {
-
+        const defaultData = this.state.stockData;
+        const defaultSymbols = this.state.stockSymbols;
         // A function that uses closure
-        return function build(stockData, stockSymbols) {
+        return function build(stockData = defaultData, stockSymbols = defaultSymbols) {
             let series = [];
 
             for (let i = 0; i < stockSymbols.length; i++) {
@@ -154,9 +156,9 @@ class App extends React.Component {
     unpackData(data, fn) {
         let stockSymbols = [];
         let stockData = [];
-        data.forEach(d => {
-            stockSymbols.push(d.stockSymbol);
-            stockData.push(d.stockDatum);
+        data.forEach(datum => {
+            stockSymbols.push(datum.stockSymbol);
+            stockData.push(datum.stockDatum);
         });
         if (!stockSymbols.length) {
             const placeholderSymbol = ['EXMPL'];
@@ -225,7 +227,8 @@ class App extends React.Component {
         const stockSymbolIndex = stockSymbols.indexOf(symbol);
         stockSymbols.splice(stockSymbolIndex, 1);
         stockData.splice(stockSymbolIndex, 1);
-        this.setState({ state }, () => console.log('state after removeStock:', this.state)); 
+        this.setState({ state }, () => console.log('state after removeStock:', this.state));
+        this.buildChart(document.querySelector('.chart-container'))();
     }
 
     componentDidMount() {
