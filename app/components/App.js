@@ -12,7 +12,11 @@ class App extends React.Component {
             input: '',
             stockData: [],
             stockSymbols: [],
-            packaged: null
+            stockNames: [],
+            packaged: null,
+            cardColor: 'green',
+            icon: false,
+            cardSymbol: null
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInput = this.handleInput.bind(this);
@@ -22,19 +26,33 @@ class App extends React.Component {
         this.packageData = this.packageData.bind(this);
         this.unpackData = this.unpackData.bind(this);
         this.removeStock = this.removeStock.bind(this);
-
+        this.toggleIcon = this.toggleIcon.bind(this);
+        this.registerCardSymbol = this.registerCardSymbol.bind(this);
     }
 
     getData(stockSymbol) {
         // console.log('stockSym arg @ getData:', stockSym);
-        const api_key = 'mx7b4emwTWnteEaLCztY';
-        const apiUrl = 'https://www.quandl.com/api/v3/datasets/WIKI/' + stockSymbol + '/data.json?api_key=';
+        const api_key = '?api_key=mx7b4emwTWnteEaLCztY';
+        const apiRoot = 'https://www.quandl.com/api/v3/datasets/WIKI/';
+        const dataAPI = apiRoot + stockSymbol + '/data.json' + api_key;
+        const metadataAPI = apiRoot + stockSymbol + '/metadata.json' + api_key;
+        const state = {...this.state};
 
-        return fetch(apiUrl + api_key)
+        fetch(metadataAPI)
+        .then(res => res.json())
+        .then(resJson => {
+            const index = resJson.dataset.name.indexOf('(');
+            const stockName = resJson.dataset.name.slice(0, index).trim();
+            state.stockNames.push(stockName);
+            this.setState({ state }, () => console.log('state after getting stockName:', this.state))
+        })
+        .catch(err => console.error(err));
+
+        return fetch(dataAPI)
         .then(res => res.json())
         .then(resJson => {
             // console.log('resJson:', resJson);
-            const state = {...this.state};
+
             let stockData = state.stockData;
 
             if (resJson['quandl_error']) {
@@ -81,6 +99,10 @@ class App extends React.Component {
         const socket = socketIOClient();
         const state = {...this.state};
         const input = state.input;
+        const stockNames = state.stockNames;
+        console.log('stockNames @ handleSubmit:', stockNames);
+        console.log('stockName @ handleSubmit:', stockName);
+        const stockName = stockNames[stockNames.length];
         const symbol = input.trim().toUpperCase();
         // console.log('trimmed input(symbol):', symbol);
         const stockSymbols = state.stockSymbols;
@@ -92,26 +114,28 @@ class App extends React.Component {
             return false;
         }
         this.setState({ input: '' });
-        this.getData(symbol)
-        .then(stockDatum => {
-            // console.log('result:', result);
-            // console.log('!hasSymbol:', !hasSymbol(symbol));
-            if (!hasSymbol(symbol) && stockDatum) {
-                const packaged = this.packageData(symbol, stockDatum);
-                // state.package = package;
-                stockSymbols.push(symbol);
-                this.setState({ state }, () => {
-                    socket.emit('stock symbols', this.state.stockSymbols);
-                    socket.emit('stock data', this.state.stockData);
-                    this.storeStockData(packaged);
-                    // console.log('state after setState:', this.state);
-                });
-            }
-        })
-        .catch(err => {
-            console.log(err);
-        });
-
+        if (!hasSymbol(symbol)) {
+            this.getData(symbol)
+            .then(stockDatum => {
+                // console.log('result:', result);
+                // console.log('!hasSymbol:', !hasSymbol(symbol));
+                if (stockDatum) {
+                    const packaged = this.packageData(symbol, stockDatum, stockName);
+                    // state.package = package;
+                    stockSymbols.push(symbol);
+                    this.setState({ state }, () => {
+                        socket.emit('stock symbols', this.state.stockSymbols);
+                        socket.emit('stock data', this.state.stockData);
+                        socket.emit('stock names', this.state.stockNames)
+                        this.storeStockData(packaged);
+                        // console.log('state after setState:', this.state);
+                    });
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
+        }
     }
 
     buildChart(where) {
@@ -145,9 +169,10 @@ class App extends React.Component {
 
     }
 
-    packageData(symbol, stockDatum) {
+    packageData(symbol, stockDatum, stockName) {
         const packaged = {
             stockSymbol: symbol,
+            stockName: stockName,
             stockDatum: stockDatum
         }
         return packaged;
@@ -156,9 +181,11 @@ class App extends React.Component {
     unpackData(data, fn) {
         let stockSymbols = [];
         let stockData = [];
+        let stockNames = [];
         data.forEach(datum => {
             stockSymbols.push(datum.stockSymbol);
             stockData.push(datum.stockDatum);
+            stockNames.push(datum.stockName)
         });
         if (!stockSymbols.length) {
             const placeholderSymbol = ['EXMPL'];
@@ -167,7 +194,8 @@ class App extends React.Component {
         } else {
             this.setState({
                 stockSymbols: stockSymbols,
-                stockData: stockData
+                stockData: stockData,
+                stockNames: stockNames
             }, () => {
                 // This fn already has chartContainer passed-in as an argument
                 if (fn) fn(stockData, stockSymbols);
@@ -221,27 +249,49 @@ class App extends React.Component {
         fetch(apiUrl + queryString)
         // fetch(testUrl)
         .catch(err => console.error(err));
+
         const state = {...this.state};
         let stockSymbols = state.stockSymbols;
         let stockData = state.stockData;
         const stockSymbolIndex = stockSymbols.indexOf(symbol);
+
         stockSymbols.splice(stockSymbolIndex, 1);
         stockData.splice(stockSymbolIndex, 1);
+        stockNames.splice(stockSymbolIndex, 1);
+
         this.setState({ state }, () => {
             console.log('state after removeStock:', this.state);
             socket.emit('stock symbols', this.state.stockSymbols);
             socket.emit('stock data', this.state.stockData);
+            socket.emit('stock names', this.state.stockNames);
         });
         this.buildChart(document.querySelector('.chart-container'))();
     }
 
+    toggleIcon() {
+        // console.log('toggledIcon');
+        this.setState({
+            icon: !this.state.icon
+        });
+    }
+
+    registerCardSymbol(evt) {
+
+        const cardSymbol = evt.target.id;
+        // console.log('registering cardSymbol:', cardSymbol);
+        this.setState({
+            cardSymbol: cardSymbol
+        });
+    }
+
     componentDidMount() {
-        console.log('componentDidMount');
+        // console.log('componentDidMount');
         const socket = socketIOClient();
         // console.log('socket:', socket);
         const chartContainer = document.querySelector('.chart-container');
 
         socket.on('stock symbols', symbols => this.setState({stockSymbols: symbols}));
+        socket.on('stock names', names => this.setState({stockNames: names}));
         socket.on('stock data', stockData => {
 
             const stockSymbols = this.state.stockSymbols;
@@ -290,30 +340,41 @@ class App extends React.Component {
         const handleKeyDown = this.handleKeyDown;
         const value = this.state.input;
         const removeStock = this.removeStock;
+        const cardColor = this.state.cardColor;
+        const changeCardColor = this.changeCardColor;
+        const toggleIcon = this.toggleIcon;
+        const icon = this.state.icon;
+        const registerCardSymbol = this.registerCardSymbol;
+        const cardSymbol = this.state.cardSymbol;
+        const stockNames = this.state.stockNames;
+        const stockInfo = stockSymbols.map((sym,i) => [sym, stockNames[i]]);
 
         return (
             <div className='app-container'>
                 <div className='chart-container'></div>
-
                 <div className='cards-container'>
-                    {/* <div className='card-wrapper'>
-                        <div className='stock-card'>{'hi'}</div>
-                        <Icon className='icon' color='grey' name='delete'></Icon>
-                    </div> */}
-                    {stockSymbols.map((sym, i) => {
-                        return (<div key={i} className='transition-wrapper'>
-                            <Transition animation='fade up' duration={800} transitionOnMount={true} >
+                    {stockInfo.map((si, i) => {
+                        const sym = si[0];
+                        const name = si[1];
+                        return (<div className='transition-wrapper' onMouseEnter={registerCardSymbol} id={sym} key={i} >
+                            <Transition animation='fade up' duration={800} transitionOnMount={true}>
                                 <div className='card-wrapper'>
-                                    <div className='stock-card'>{sym}</div>
-                                    <Icon onClick={removeStock} id={sym} className='icon' color='grey' name='delete'></Icon>
+                                    <div className='stock-card' id={sym} onMouseEnter={toggleIcon} onMouseLeave={toggleIcon}>
+                                        <div className='stock-symbol-wrapper'>{sym}</div>
+                                        <div className='stock-name-wrapper'>{name}</div>
+                                        {icon && (cardSymbol === sym) ? <Icon onClick={(evt) => {removeStock(evt); toggleIcon()}}
+                                            id={sym} className='icon' color='grey' name='delete'></Icon> : ''}
+                                    </div>
                                 </div>
                             </Transition>
                         </div>)
                     })}
                 </div>
                 <div className='search-container'>
-                    <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='AAPL' value={value}/>
-                    <Button basic color='green' onClick={handleSubmit}>Add</Button>
+                    <div className='search-wrapper'>
+                        <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
+                        <Button className='button' basic color='grey' onClick={handleSubmit}>Add</Button>
+                    </div>
                 </div>
             </div>
         );

@@ -3,67 +3,88 @@
     box-sizing: border-box;
 }
 .app-container {
+    border: 1px solid blue;
     .chart-container {
-        width: 400px;
+        margin: auto;
+        // border: 1px solid green;
+        width: 80%;
         height: 400px;
     }
-    .transition-wrapper {
-        display: inline-block;
-        margin: 0.2em;
-        width: 100px;
-        height: 50px;
-        .card-wrapper {
-            position: relative;
-            border: 1px solid black;
-            border-radius: 2px;
-            width: 100px;
-            height: 50px;
-            .stock-card {
-
-                border-left: 3px solid green;
+    .cards-container {
+        margin: auto;
+        width: 80%;
+        .transition-wrapper {
+            // border: 1px solid grey;
+            display: inline-block;
+            margin: 0.2em;
+            width: 110px;
+            height: 60px;
+            .card-wrapper {
+                position: relative;
+                border: 1px solid grey;
+                border-radius: 2px;
                 width: 100px;
                 height: 50px;
-                &:hover {
-                    border-left: 3px solid red;
+                margin: auto;
+                top: 50%;
+                transform: translateY(-25px);
+                .stock-card {
+                    text-align: center;
+                    border-left: 3px solid green;
+                    border-top-left-radius: 1px;
+                    border-bottom-left-radius: 1px;
+                    width: 100px;
+                    height: 50px * .98;
+                    transition: all 0.3s ease;
+                    &:hover {
+                        border-left: 5px solid red;
+                        border-top-left-radius: 1px;
+                        border-bottom-left-radius: 2px;
+                    }
                 }
-            }
-            .icon {
-                position: absolute;
-                top: 0;
-                right: 0;
-                &:hover {
-                    cursor: pointer;
+                .icon {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+
+                    &:hover {
+                        cursor: pointer;
+                    }
                 }
             }
         }
     }
-    // .card-wrapper {
-    //     position: relative;
-    //     border: 1px solid black;
-    //     border-radius: 2px;
-    //     width: 100px;
-    //     height: 50px;
-    //     .stock-card {
-    //
-    //         border-left: 3px solid green;
-    //         width: 100px;
-    //         height: 50px;
-    //         &:hover {
-    //             border-left: 3px solid red;
-    //         }
-    //     }
-    //     .icon {
-    //         position: absolute;
-    //         top: 0;
-    //         right: 0;
-    //     }
-    // }
     .search-container {
-        input {
-            border: 1px solid $s-ui-green;
-            height: 41.1px;
-            border-radius: 5px;
-            margin-right: 0.2em;
+        // border: 1px solid magenta;
+        margin: auto;
+        width: 100%;
+        .search-wrapper {
+            height: 40px;
+            margin: auto;
+            width: 60%;
+            display: flex;
+            flex-direction: row;
+            input {
+                flex-grow: 8.5;
+                border: 1px solid grey;
+                height: 100%;
+                // width: 150px;
+                border-radius: 5px;
+                margin-right: 0.2em;
+                padding-left: 1em;
+                &:focus {
+                    outline: none;
+                    border: 1px solid green;
+                    color: green;
+                    &::placeholder {
+                        color: green;
+
+                    }
+                }
+            }
+            .button {
+                flex-grow: 1.5;
+            }
         }
     }
 }
