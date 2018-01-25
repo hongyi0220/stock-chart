@@ -3,13 +3,13 @@
     box-sizing: border-box;
 }
 html {
-    // background-color: black;
+    background-color: black;
     // border: 1px solid red;
     // border: 0;
     // background: url('/build/img/stock.jpeg') no-repeat center;
     margin: 0;
     body {
-        // background-color: black;
+        background-color: black;
         // background: url('/build/img/stock.jpeg') no-repeat center;
     }
     .container-all {
@@ -19,16 +19,89 @@ html {
             top: 0;
             left: 0;
             width: 100%;
-            border: 5px solid red;
+            // border: 5px solid red;
             height: 100%;
+            .view-chart-wrapper {
+                position: relative;
+                // border: 1px solid teal;
+                text-align: center;
+                top: 50%;
+                transform: translateY(-40px);
+                img {
+                    height: 80px;
+                }
+                .view-chart-text-wrapper {
+                    color: white;
+                }
+            }
             .sidebar {
-                border: 1px solid green;
-                background: black;
+                // border: 1px solid teal;
+                background: rgba(0,0,0,0.5);
                 color: white;
+                .about-container {
+                    position: relative;
+                    // border: 2px solid green;
+                    text-align: center;
+                    height: 390px;
+                    top: 50%;
+                    transform: translateY(-200px);
+                    .about-text-wrapper {
+                        margin-bottom: 1.5em;
+                        font-size: 1.9em;
+                    }
+                    .tech-text-wrapper {
+                        font-size: 1.3em;
+                    }
+                    .logos-container {
+                        font-size: 1em;
+
+                        .logo-wrapper {
+                            margin: .3em;
+                            padding: 0 .5em 0 .5em;
+                            display: inline-block;
+                            // border: 2px solid red;
+                            background: rgb(50,50,50);
+                            border-radius: 5px;
+                            .logo-text-wrapper {
+                                // border: 1px solid yellow;
+                                display: inline-block;
+                                height: 50px;
+                                line-height: 50px;
+                            }
+                            img {
+                                // border: 1px solid yellow;
+                                height: 50px;
+                            }
+                        }
+                        .react-logo-wrapper {
+                            padding: 0 1em 0 0em;
+                        }
+                        .nodejs-logo-wrapper {
+                            padding: 0 .8em 0 0em;
+                        }
+                        .mongodb-logo-wrapper {
+                            padding: 0 .9em 0 0em;
+                        }
+                        .logo-wrapper > * {
+                            vertical-align: top;
+                        }
+                    }
+                }
             }
             .arrow {
-                position: relative;
+                position: absolute;
+                display: inline-block;
+                top: 50%;
+                width: 32px;
+                height: 32px;
+                transform: translateY(-16px);
                 color: white;
+                font-size: 4em;
+                // border: 1px solid white;
+                &:hover {
+                    color: teal;
+                    cursor: pointer;
+                }
             }
         }
         .app-container {

@@ -436,8 +436,33 @@ class App extends React.Component {
         return (
             <div onClick={() => {if (visible) toggleSidebar()}} className='container-all'>
                 <div className='gloss'>
-                    <Sidebar animation='overlay' visible={visible} width='wide'>hello</Sidebar>
-                    <div className='arrow' onClick={toggleSidebar}>></div>
+                    <div className='view-chart-wrapper'><img src='/img/line-chart2.png'/><div className='view-chart-text-wrapper'>View Chart</div></div>
+                    <Sidebar animation='overlay' visible={visible} width='very wide'>
+                        <div className='about-container'>
+                            <div className='about-text-wrapper'>About This App</div>
+                            <div className='tech-text-wrapper'>Front-end tech stack</div>
+                            <div className='front-end-logos-container logos-container'>
+                                <div className='react-logo-wrapper logo-wrapper'><img src='/img/logos/react-logo.png'/><div className='logo-text-wrapper'>React</div></div>
+                                <div className='semantic-ui-logo-wrapper logo-wrapper'><img src='/img/logos/semantic-ui-logo.png'/><div className='logo-text-wrapper'>Semantic-UI-React</div></div>
+                            </div>
+                            <div className='tech-text-wrapper'>Back-end tech stack</div>
+                            <div className='back-end-logos-container logos-container'>
+                                <div className='nodejs-logo-wrapper logo-wrapper'><img src='/img/logos/nodejs-logo2.png'/><div className='logo-text-wrapper'>Node.js</div></div>
+                                <div className='logo-wrapper'><img src='/img/logos/expressjs-logo2.png'/><div className='logo-text-wrapper'>Express.js</div></div>
+                                <div className='mongodb-logo-wrapper logo-wrapper'><img src='/img/logos/mongodb-logo.png'/><div className='logo-text-wrapper'>MongoDBv</div></div>
+                            </div>
+                            <div className='tech-text-wrapper'>API</div>
+                            <div className='api-logos-container logos-container'>
+                                <div className='logo-wrapper'><img src='/img/logos/quandl-logo.png'/><div className='logo-text-wrapper'>Quandl</div></div>
+                            </div>
+                            <div className='tech-text-wrapper'>Key modules</div>
+                            <div className='modules-logos-container logos-container'>
+                                <div className='logo-wrapper'><img src='/img/logos/socketio-logo.gif'/><div className='logo-text-wrapper'>Socket.io</div></div>
+                                <div className='logo-wrapper'><img src='/img/logos/highcharts-logo.png'/><div className='logo-text-wrapper'>Highcharts</div></div>
+                            </div>
+                        </div>
+                    </Sidebar>
+                    {!visible ? <div className='arrow' onClick={toggleSidebar}>></div> : ''}
                 </div>
                 <div className='app-container'>
                     <div className='chart-container'></div>
