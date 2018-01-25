@@ -45969,34 +45969,58 @@ var App = function (_React$Component) {
         _this.unpackData = _this.unpackData.bind(_this);
         _this.removeStock = _this.removeStock.bind(_this);
         _this.toggleIcon = _this.toggleIcon.bind(_this);
+        _this.toggleIconOff = _this.toggleIconOff.bind(_this);
         _this.registerCardSymbol = _this.registerCardSymbol.bind(_this);
+        _this.deregisterCardSymbol = _this.deregisterCardSymbol.bind(_this);
+        _this.getStockName = _this.getStockName.bind(_this);
         return _this;
     }
 
     _createClass(App, [{
-        key: 'getData',
-        value: function getData(stockSymbol) {
+        key: 'getStockName',
+        value: function getStockName(stockSymbol) {
             var _this2 = this;
 
-            // console.log('stockSym arg @ getData:', stockSym);
             var api_key = '?api_key=mx7b4emwTWnteEaLCztY';
             var apiRoot = 'https://www.quandl.com/api/v3/datasets/WIKI/';
-            var dataAPI = apiRoot + stockSymbol + '/data.json' + api_key;
             var metadataAPI = apiRoot + stockSymbol + '/metadata.json' + api_key;
             var state = _extends({}, this.state);
 
-            fetch(metadataAPI).then(function (res) {
+            return fetch(metadataAPI).then(function (res) {
                 return res.json();
             }).then(function (resJson) {
                 var index = resJson.dataset.name.indexOf('(');
                 var stockName = resJson.dataset.name.slice(0, index).trim();
+
                 state.stockNames.push(stockName);
                 _this2.setState({ state: state }, function () {
                     return console.log('state after getting stockName:', _this2.state);
                 });
+                return stockName;
             }).catch(function (err) {
                 return console.error(err);
             });
+        }
+    }, {
+        key: 'getData',
+        value: function getData(stockSymbol) {
+            var _this3 = this;
+
+            var api_key = '?api_key=mx7b4emwTWnteEaLCztY';
+            var apiRoot = 'https://www.quandl.com/api/v3/datasets/WIKI/';
+            var dataAPI = apiRoot + stockSymbol + '/data.json' + api_key;
+            // const metadataAPI = apiRoot + stockSymbol + '/metadata.json' + api_key;
+            var state = _extends({}, this.state);
+            //
+            // fetch(metadataAPI)
+            // .then(res => res.json())
+            // .then(resJson => {
+            //     const index = resJson.dataset.name.indexOf('(');
+            //     const stockName = resJson.dataset.name.slice(0, index).trim();
+            //     state.stockNames.push(stockName);
+            //     this.setState({ state }, () => console.log('state after getting stockName:', this.state))
+            // })
+            // .catch(err => console.error(err));
 
             return fetch(dataAPI).then(function (res) {
                 return res.json();
@@ -46011,7 +46035,7 @@ var App = function (_React$Component) {
                 var transformedData = transformData(resJson);
 
                 stockData.push(transformedData);
-                _this2.setState({ state: state /*, () => console.log('state after setState @ getData:', this.state)*/ });
+                _this3.setState({ state: state /*, () => console.log('state after setState @ getData:', this.state)*/ });
                 return transformedData;
             }).catch(function (err) {
                 console.log(err);
@@ -46048,19 +46072,20 @@ var App = function (_React$Component) {
     }, {
         key: 'handleSubmit',
         value: function handleSubmit() {
-            var _this3 = this;
+            var _this4 = this;
 
             var socket = (0, _socket2.default)();
             var state = _extends({}, this.state);
             var input = state.input;
-            var stockNames = state.stockNames;
-            console.log('stockNames @ handleSubmit:', stockNames);
-            console.log('stockName @ handleSubmit:', stockName);
-            var stockName = stockNames[stockNames.length];
+            // const stockNames = state.stockNames;
+            // console.log('stockNames @ handleSubmit:', stockNames);
+            // console.log('stockName @ handleSubmit:', stockName);
+            // const stockName = stockNames[stockNames.length];
             var symbol = input.trim().toUpperCase();
             // console.log('trimmed input(symbol):', symbol);
             var stockSymbols = state.stockSymbols;
-
+            // let packaging;
+            // console.log('packaging:', packaging);
             function hasSymbol(sym) {
                 for (var i = 0; i < stockSymbols.length; i++) {
                     if (stockSymbols[i] === sym) return true;
@@ -46073,19 +46098,27 @@ var App = function (_React$Component) {
                     // console.log('result:', result);
                     // console.log('!hasSymbol:', !hasSymbol(symbol));
                     if (stockDatum) {
-                        var packaged = _this3.packageData(symbol, stockDatum, stockName);
-                        // state.package = package;
+                        var packaging = _this4.packageData(symbol, stockDatum);
                         stockSymbols.push(symbol);
-                        _this3.setState({ state: state }, function () {
-                            socket.emit('stock symbols', _this3.state.stockSymbols);
-                            socket.emit('stock data', _this3.state.stockData);
-                            socket.emit('stock names', _this3.state.stockNames);
-                            _this3.storeStockData(packaged);
-                            // console.log('state after setState:', this.state);
+
+                        _this4.getStockName(symbol).then(function (name) {
+                            var packaged = packaging(name);
+                            _this4.setState({ state: state }, function () {
+                                console.log('symbols to emit:', _this4.state.stockSymbols);
+                                console.log('names to emit:', _this4.state.stockNames);
+                                console.log('data to emit:', _this4.state.stockData);
+                                socket.emit('stock symbols', _this4.state.stockSymbols);
+                                socket.emit('stock names', _this4.state.stockNames);
+                                socket.emit('stock data', _this4.state.stockData);
+                                _this4.storeStockData(packaged);
+                                // console.log('state after setState:', this.state);
+                            });
+                        }).catch(function (err) {
+                            return console.error(err);
                         });
                     }
                 }).catch(function (err) {
-                    console.log(err);
+                    return console.log(err);
                 });
             }
         }
@@ -46125,18 +46158,20 @@ var App = function (_React$Component) {
         }
     }, {
         key: 'packageData',
-        value: function packageData(symbol, stockDatum, stockName) {
-            var packaged = {
-                stockSymbol: symbol,
-                stockName: stockName,
-                stockDatum: stockDatum
+        value: function packageData(symbol, stockDatum) {
+            return function packaging(stockName) {
+                var pkg = {
+                    stockSymbol: symbol,
+                    stockName: stockName,
+                    stockDatum: stockDatum
+                };
+                return pkg;
             };
-            return packaged;
         }
     }, {
         key: 'unpackData',
         value: function unpackData(data, fn) {
-            var _this4 = this;
+            var _this5 = this;
 
             var stockSymbols = [];
             var stockData = [];
@@ -46158,7 +46193,7 @@ var App = function (_React$Component) {
                 }, function () {
                     // This fn already has chartContainer passed-in as an argument
                     if (fn) fn(stockData, stockSymbols);
-                    console.log('state after unpacking:', _this4.state);
+                    console.log('state after unpacking:', _this5.state);
                 });
             }
         }
@@ -46202,14 +46237,14 @@ var App = function (_React$Component) {
     }, {
         key: 'removeStock',
         value: function removeStock(evt) {
-            var _this5 = this;
+            var _this6 = this;
 
             var socket = (0, _socket2.default)();
             var symbol = evt.target.id;
             var queryString = '?symbol=' + symbol.toLowerCase();
             var apiUrl = 'http://localhost:8080/remove';
             // const testUrl = 'http://localhost:8080/remove/:symbol=fb';
-            console.log('removeStock:', symbol);
+            // console.log('removeStock:', symbol);
             fetch(apiUrl + queryString)
             // fetch(testUrl)
             .catch(function (err) {
@@ -46219,6 +46254,7 @@ var App = function (_React$Component) {
             var state = _extends({}, this.state);
             var stockSymbols = state.stockSymbols;
             var stockData = state.stockData;
+            var stockNames = state.stockNames;
             var stockSymbolIndex = stockSymbols.indexOf(symbol);
 
             stockSymbols.splice(stockSymbolIndex, 1);
@@ -46226,35 +46262,69 @@ var App = function (_React$Component) {
             stockNames.splice(stockSymbolIndex, 1);
 
             this.setState({ state: state }, function () {
-                console.log('state after removeStock:', _this5.state);
-                socket.emit('stock symbols', _this5.state.stockSymbols);
-                socket.emit('stock data', _this5.state.stockData);
-                socket.emit('stock names', _this5.state.stockNames);
+                // console.log('state after removeStock:', this.state);
+                socket.emit('stock symbols', _this6.state.stockSymbols);
+                socket.emit('stock names', _this6.state.stockNames);
+                socket.emit('stock data', _this6.state.stockData);
             });
             this.buildChart(document.querySelector('.chart-container'))();
         }
     }, {
         key: 'toggleIcon',
         value: function toggleIcon() {
-            // console.log('toggledIcon');
+            var _this7 = this;
+
+            console.log('toggledIcon');
             this.setState({
-                icon: !this.state.icon
+                icon: true
+            }, function () {
+                return console.log('icon on?:', _this7.state.icon);
+            });
+        }
+    }, {
+        key: 'toggleIconOff',
+        value: function toggleIconOff() {
+            var _this8 = this;
+
+            console.log('toggledIcon OFF');
+            this.setState({
+                icon: false
+            }, function () {
+                return console.log('icon on?:', _this8.state.icon);
             });
         }
     }, {
         key: 'registerCardSymbol',
         value: function registerCardSymbol(evt) {
+            var _this9 = this;
 
+            // let cardSymbol;
+            // if (evt) cardSymbol = evt.target.id;
             var cardSymbol = evt.target.id;
-            // console.log('registering cardSymbol:', cardSymbol);
+            console.log('registering cardSymbol:', cardSymbol);
             this.setState({
                 cardSymbol: cardSymbol
+            }, function () {
+                return console.log('cardSymbol after registering:', _this9.state.cardSymbol);
+            });
+        }
+    }, {
+        key: 'deregisterCardSymbol',
+        value: function deregisterCardSymbol(evt) {
+            var _this10 = this;
+
+            var cardSymbol = evt.target.id;
+            console.log('de-registering cardSymbol:', cardSymbol);
+            this.setState({
+                cardSymbol: null
+            }, function () {
+                return console.log('cardSymbol after de-registering:', _this10.state.cardSymbol);
             });
         }
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this6 = this;
+            var _this11 = this;
 
             // console.log('componentDidMount');
             var socket = (0, _socket2.default)();
@@ -46262,16 +46332,18 @@ var App = function (_React$Component) {
             var chartContainer = document.querySelector('.chart-container');
 
             socket.on('stock symbols', function (symbols) {
-                return _this6.setState({ stockSymbols: symbols });
+                // console.log('socket.on symbols:', symbols);
+                _this11.setState({ stockSymbols: symbols });
             });
             socket.on('stock names', function (names) {
-                return _this6.setState({ stockNames: names });
+                // console.log('socket.on names:', names);
+                _this11.setState({ stockNames: names });
             });
             socket.on('stock data', function (stockData) {
 
-                var stockSymbols = _this6.state.stockSymbols;
-                _this6.setState({ stockData: stockData });
-                var build = _this6.buildChart(chartContainer);
+                var stockSymbols = _this11.state.stockSymbols;
+                _this11.setState({ stockData: stockData });
+                var build = _this11.buildChart(chartContainer);
                 // Using inner function's closure over the argument chartContainer
                 build(stockData, stockSymbols);
                 // console.log('setState @ compDidMnt:', this.state);
@@ -46292,9 +46364,9 @@ var App = function (_React$Component) {
                     localStorage.setItem('visited', 'true');
                     // console.log('stockData, stockSymbols:', stockData, stockSymbols);
                     this.getStockData().then(function (packaged) {
-                        var build = _this6.buildChart(chartContainer);
+                        var build = _this11.buildChart(chartContainer);
                         // console.log('does chartContainer exist inside the scope of a promise?:', chartContainer);
-                        _this6.unpackData(packaged, build);
+                        _this11.unpackData(packaged, build);
                     }).catch(function (err) {
                         return console.error(err);
                     });
@@ -46317,8 +46389,10 @@ var App = function (_React$Component) {
             var cardColor = this.state.cardColor;
             var changeCardColor = this.changeCardColor;
             var toggleIcon = this.toggleIcon;
+            var toggleIconOff = this.toggleIconOff;
             var icon = this.state.icon;
             var registerCardSymbol = this.registerCardSymbol;
+            var deregisterCardSymbol = this.deregisterCardSymbol;
             var cardSymbol = this.state.cardSymbol;
             var stockNames = this.state.stockNames;
             var stockInfo = stockSymbols.map(function (sym, i) {
@@ -46337,7 +46411,12 @@ var App = function (_React$Component) {
                         var name = si[1];
                         return _react2.default.createElement(
                             'div',
-                            { className: 'transition-wrapper', onMouseEnter: registerCardSymbol, id: sym, key: i },
+                            { className: 'transition-wrapper', onMouseEnter: function onMouseEnter(evt) {
+                                    registerCardSymbol(evt);toggleIcon();
+                                },
+                                onMouseLeave: function onMouseLeave(evt) {
+                                    deregisterCardSymbol(evt);toggleIconOff();
+                                }, id: sym, key: i },
                             _react2.default.createElement(
                                 _semanticUiReact.Transition,
                                 { animation: 'fade up', duration: 800, transitionOnMount: true },
@@ -46346,7 +46425,7 @@ var App = function (_React$Component) {
                                     { className: 'card-wrapper' },
                                     _react2.default.createElement(
                                         'div',
-                                        { className: 'stock-card', id: sym, onMouseEnter: toggleIcon, onMouseLeave: toggleIcon },
+                                        { className: 'stock-card', id: sym },
                                         _react2.default.createElement(
                                             'div',
                                             { className: 'stock-symbol-wrapper' },
@@ -46358,7 +46437,7 @@ var App = function (_React$Component) {
                                             name
                                         ),
                                         icon && cardSymbol === sym ? _react2.default.createElement(_semanticUiReact.Icon, { onClick: function onClick(evt) {
-                                                removeStock(evt);toggleIcon();
+                                                removeStock(evt); /*registerCardSymbol(evt); toggleIcon()*/
                                             },
                                             id: sym, className: 'icon', color: 'grey', name: 'delete' }) : ''
                                     )

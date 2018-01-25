@@ -87,6 +87,10 @@ io.on('connection', function(socket) {
         // console.log('symbols recieved @ server:', symbols);
         socket.broadcast.emit('stock symbols', symbols);
     });
+    socket.on('stock names', function(names) {
+        // console.log('dataset recieved @ server:', dataset);
+        socket.broadcast.emit('stock names', names);
+    });
     socket.on('stock data', function(stockData) {
         // console.log('dataset recieved @ server:', dataset);
         socket.broadcast.emit('stock data', stockData);
