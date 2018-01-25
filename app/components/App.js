@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter, Route, Switch } from 'react-router-dom';
+import { withRouter, Route, Switch, Link } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 import Highcharts from 'highcharts/highstock';
 import { Transition, Icon, Sidebar } from 'semantic-ui-react';
@@ -435,69 +435,82 @@ class App extends React.Component {
 
         return (
             <div onClick={() => {if (visible) toggleSidebar()}} className='container-all'>
-                <div className='gloss'>
-                    <div className='view-chart-wrapper'><img src='/img/line-chart2.png'/><div className='view-chart-text-wrapper'>View Chart</div></div>
-                    <Sidebar animation='overlay' visible={visible} width='very wide'>
-                        <div className='about-container'>
-                            <div className='about-text-wrapper'>About This App</div>
-                            <div className='tech-text-wrapper'>Front-end tech stack</div>
-                            <div className='front-end-logos-container logos-container'>
-                                <div className='react-logo-wrapper logo-wrapper'><img src='/img/logos/react-logo.png'/><div className='logo-text-wrapper'>React</div></div>
-                                <div className='semantic-ui-logo-wrapper logo-wrapper'><img src='/img/logos/semantic-ui-logo.png'/><div className='logo-text-wrapper'>Semantic-UI-React</div></div>
+                <Switch>
+                    <Route path='/chart'>
+                        <div className='app-container'>
+                            <div className='logo-wrapper'><Link to='/'><img src='/img/logo2.png'/></Link></div>
+                            <div className='chart-container'></div>
+                            <div className='cards-container'>
+                                {stockInfo.map((si, i) => {
+                                    const sym = si[0];
+                                    const name = si[1];
+                                    return (<div className='transition-wrapper' onMouseEnter={(evt) => {registerCardSymbol(evt); toggleIcon()}}
+                                        onMouseLeave={(evt) => {deregisterCardSymbol(evt); toggleIconOff()}} id={sym} key={i} >
+                                        <Transition animation='fade up' duration={300} transitionOnMount={true}>
+                                            <div className='card-wrapper'>
+                                                <div className='stock-card' id={sym} >
+                                                    <div className='stock-symbol-wrapper'>{sym}</div>
+                                                    <div className='stock-name-wrapper'>{name}</div>
+                                                    {icon && (cardSymbol === sym) ? <Icon onClick={(evt) => {removeStock(evt); /*registerCardSymbol(evt); toggleIcon()*/}}
+                                                        id={sym} className='icon' color='grey' name='delete'></Icon> : ''}
+                                                </div>
+                                            </div>
+                                        </Transition>
+                                    </div>)
+                                })}
                             </div>
-                            <div className='tech-text-wrapper'>Back-end tech stack</div>
-                            <div className='back-end-logos-container logos-container'>
-                                <div className='nodejs-logo-wrapper logo-wrapper'><img src='/img/logos/nodejs-logo2.png'/><div className='logo-text-wrapper'>Node.js</div></div>
-                                <div className='logo-wrapper'><img src='/img/logos/expressjs-logo2.png'/><div className='logo-text-wrapper'>Express.js</div></div>
-                                <div className='mongodb-logo-wrapper logo-wrapper'><img src='/img/logos/mongodb-logo.png'/><div className='logo-text-wrapper'>MongoDBv</div></div>
+
+                            <div className='search-container'>
+                                <div className='search-wrapper'>
+                                    <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
+                                    <div className='button' onClick={handleSubmit}>ADD</div>
+                                </div>
+                                <div className='cards-full-container'>
+                                    <div className='cards-full-msg-wrapper'>{cardsFull ? 'Maximum number of chartable stocks reached.' : ''}</div>
+                                    <div className='error-msg-wrapper'>{error ? 'Provided stock code didn\'t yield any results.' : ''}</div>
+                                </div>
                             </div>
-                            <div className='tech-text-wrapper'>API</div>
-                            <div className='api-logos-container logos-container'>
-                                <div className='logo-wrapper'><img src='/img/logos/quandl-logo.png'/><div className='logo-text-wrapper'>Quandl</div></div>
-                            </div>
-                            <div className='tech-text-wrapper'>Key modules</div>
-                            <div className='modules-logos-container logos-container'>
-                                <div className='logo-wrapper'><img src='/img/logos/socketio-logo.gif'/><div className='logo-text-wrapper'>Socket.io</div></div>
-                                <div className='logo-wrapper'><img src='/img/logos/highcharts-logo.png'/><div className='logo-text-wrapper'>Highcharts</div></div>
-                            </div>
+
                         </div>
-                    </Sidebar>
-                    {!visible ? <div className='arrow' onClick={toggleSidebar}>></div> : ''}
-                </div>
-                <div className='app-container'>
-                    <div className='chart-container'></div>
-                    <div className='cards-container'>
-                        {stockInfo.map((si, i) => {
-                            const sym = si[0];
-                            const name = si[1];
-                            return (<div className='transition-wrapper' onMouseEnter={(evt) => {registerCardSymbol(evt); toggleIcon()}}
-                                onMouseLeave={(evt) => {deregisterCardSymbol(evt); toggleIconOff()}} id={sym} key={i} >
-                                <Transition animation='fade up' duration={300} transitionOnMount={true}>
-                                    <div className='card-wrapper'>
-                                        <div className='stock-card' id={sym} >
-                                            <div className='stock-symbol-wrapper'>{sym}</div>
-                                            <div className='stock-name-wrapper'>{name}</div>
-                                            {icon && (cardSymbol === sym) ? <Icon onClick={(evt) => {removeStock(evt); /*registerCardSymbol(evt); toggleIcon()*/}}
-                                                id={sym} className='icon' color='grey' name='delete'></Icon> : ''}
-                                        </div>
+                    </Route>
+                    <Route path='/'>
+                        <div className='gloss'>
+                            <div className='logo-wrapper'><Link to='/'><img src='/img/logo2.png'/></Link></div>
+                            <div className='view-chart-wrapper'>
+                                <Link to='/chart'>
+                                    <img src='/img/line-chart2.png'/>
+                                    <div className='view-chart-text-wrapper'>View Chart</div>
+                                </Link>
+                            </div>
+                            <Sidebar animation='overlay' visible={visible} width='very wide'>
+                                <div className='about-container'>
+                                    <div className='about-text-wrapper'>About This App</div>
+                                    <div className='tech-text-wrapper'>Front-end tech stack</div>
+                                    <div className='front-end-logos-container logos-container'>
+                                        <div className='react-logo-wrapper logo-wrapper'><img src='/img/logos/react-logo.png'/><div className='logo-text-wrapper'>React</div></div>
+                                        <div className='semantic-ui-logo-wrapper logo-wrapper'><img src='/img/logos/semantic-ui-logo.png'/><div className='logo-text-wrapper'>Semantic-UI-React</div></div>
                                     </div>
-                                </Transition>
-                            </div>)
-                        })}
-                    </div>
-
-                    <div className='search-container'>
-                        <div className='search-wrapper'>
-                            <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
-                            <div className='button' onClick={handleSubmit}>ADD</div>
+                                    <div className='tech-text-wrapper'>Back-end tech stack</div>
+                                    <div className='back-end-logos-container logos-container'>
+                                        <div className='nodejs-logo-wrapper logo-wrapper'><img src='/img/logos/nodejs-logo2.png'/><div className='logo-text-wrapper'>Node.js</div></div>
+                                        <div className='logo-wrapper'><img src='/img/logos/expressjs-logo2.png'/><div className='logo-text-wrapper'>Express.js</div></div>
+                                        <div className='mongodb-logo-wrapper logo-wrapper'><img src='/img/logos/mongodb-logo.png'/><div className='logo-text-wrapper'>MongoDBv</div></div>
+                                    </div>
+                                    <div className='tech-text-wrapper'>API</div>
+                                    <div className='api-logos-container logos-container'>
+                                        <div className='logo-wrapper'><img src='/img/logos/quandl-logo.png'/><div className='logo-text-wrapper'>Quandl</div></div>
+                                    </div>
+                                    <div className='tech-text-wrapper'>Key modules</div>
+                                    <div className='modules-logos-container logos-container'>
+                                        <div className='logo-wrapper'><img src='/img/logos/socketio-logo.gif'/><div className='logo-text-wrapper'>Socket.io</div></div>
+                                        <div className='logo-wrapper'><img src='/img/logos/highcharts-logo.png'/><div className='logo-text-wrapper'>Highcharts</div></div>
+                                    </div>
+                                </div>
+                            </Sidebar>
+                            {!visible ? <div className='arrow' onClick={toggleSidebar}>></div> : ''}
                         </div>
-                        <div className='cards-full-container'>
-                            <div className='cards-full-msg-wrapper'>{cardsFull ? 'Maximum number of chartable stocks reached.' : ''}</div>
-                            <div className='error-msg-wrapper'>{error ? 'Provided stock code didn\'t yield any results.' : ''}</div>
-                        </div>
-                    </div>
-
-                </div>
+                    </Route>
+                </Switch>
             </div>
             // {/* <div className='app-container'>
             //     <div className='chart-container'></div>

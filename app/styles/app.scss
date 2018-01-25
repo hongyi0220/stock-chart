@@ -13,6 +13,16 @@ html {
         // background: url('/build/img/stock.jpeg') no-repeat center;
     }
     .container-all {
+        .logo-wrapper {
+            // border: 1px solid red;
+            img {
+                height: 100px;
+                // border: 1px solid red;
+            }
+            &:hover {
+                cursor: hand;
+            }
+        }
         .gloss {
             position: absolute;
             background: url("/img/stock.jpeg") no-repeat center;
@@ -25,13 +35,20 @@ html {
                 position: relative;
                 // border: 1px solid teal;
                 text-align: center;
+                // margin: auto;
                 top: 50%;
-                transform: translateY(-40px);
+                transform: translateY(-40px - 115);
                 img {
                     height: 80px;
+                    &:hover {
+                        cursor: hand;
+                    }
                 }
                 .view-chart-text-wrapper {
                     color: white;
+                    &:hover {
+                        cursor: hand;
+                    }
                 }
             }
             .sidebar {

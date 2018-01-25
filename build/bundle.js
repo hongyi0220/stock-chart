@@ -45962,7 +45962,8 @@ var App = function (_React$Component) {
             icon: false,
             cardSymbol: null,
             cardsFull: false,
-            error: null
+            error: null,
+            sidebar: false
         };
         _this.handleSubmit = _this.handleSubmit.bind(_this);
         _this.handleInput = _this.handleInput.bind(_this);
@@ -45977,6 +45978,7 @@ var App = function (_React$Component) {
         _this.registerCardSymbol = _this.registerCardSymbol.bind(_this);
         _this.deregisterCardSymbol = _this.deregisterCardSymbol.bind(_this);
         _this.getStockName = _this.getStockName.bind(_this);
+        _this.toggleSidebar = _this.toggleSidebar.bind(_this);
         return _this;
     }
 
@@ -46312,6 +46314,11 @@ var App = function (_React$Component) {
                 cardSymbol: null /*, () => console.log('cardSymbol after de-registering:', this.state.cardSymbol)*/ });
         }
     }, {
+        key: 'toggleSidebar',
+        value: function toggleSidebar() {
+            this.setState({ sidebar: !this.state.sidebar });
+        }
+    }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
             var _this6 = this;
@@ -46395,83 +46402,308 @@ var App = function (_React$Component) {
             });
             var cardsFull = this.state.cardsFull;
             var error = this.state.error;
+            var toggleSidebar = this.toggleSidebar;
+            var visible = this.state.sidebar;
 
             return _react2.default.createElement(
                 'div',
-                { className: 'app-container' },
-                _react2.default.createElement('div', { className: 'chart-container' }),
+                { onClick: function onClick() {
+                        if (visible) toggleSidebar();
+                    }, className: 'container-all' },
                 _react2.default.createElement(
-                    'div',
-                    { className: 'cards-container' },
-                    stockInfo.map(function (si, i) {
-                        var sym = si[0];
-                        var name = si[1];
-                        return _react2.default.createElement(
+                    _reactRouterDom.Switch,
+                    null,
+                    _react2.default.createElement(
+                        _reactRouterDom.Route,
+                        { path: '/chart' },
+                        _react2.default.createElement(
                             'div',
-                            { className: 'transition-wrapper', onMouseEnter: function onMouseEnter(evt) {
-                                    registerCardSymbol(evt);toggleIcon();
-                                },
-                                onMouseLeave: function onMouseLeave(evt) {
-                                    deregisterCardSymbol(evt);toggleIconOff();
-                                }, id: sym, key: i },
+                            { className: 'app-container' },
                             _react2.default.createElement(
-                                _semanticUiReact.Transition,
-                                { animation: 'fade up', duration: 300, transitionOnMount: true },
+                                'div',
+                                { className: 'logo-wrapper' },
+                                _react2.default.createElement(
+                                    _reactRouterDom.Link,
+                                    { to: '/' },
+                                    _react2.default.createElement('img', { src: '/img/logo2.png' })
+                                )
+                            ),
+                            _react2.default.createElement('div', { className: 'chart-container' }),
+                            _react2.default.createElement(
+                                'div',
+                                { className: 'cards-container' },
+                                stockInfo.map(function (si, i) {
+                                    var sym = si[0];
+                                    var name = si[1];
+                                    return _react2.default.createElement(
+                                        'div',
+                                        { className: 'transition-wrapper', onMouseEnter: function onMouseEnter(evt) {
+                                                registerCardSymbol(evt);toggleIcon();
+                                            },
+                                            onMouseLeave: function onMouseLeave(evt) {
+                                                deregisterCardSymbol(evt);toggleIconOff();
+                                            }, id: sym, key: i },
+                                        _react2.default.createElement(
+                                            _semanticUiReact.Transition,
+                                            { animation: 'fade up', duration: 300, transitionOnMount: true },
+                                            _react2.default.createElement(
+                                                'div',
+                                                { className: 'card-wrapper' },
+                                                _react2.default.createElement(
+                                                    'div',
+                                                    { className: 'stock-card', id: sym },
+                                                    _react2.default.createElement(
+                                                        'div',
+                                                        { className: 'stock-symbol-wrapper' },
+                                                        sym
+                                                    ),
+                                                    _react2.default.createElement(
+                                                        'div',
+                                                        { className: 'stock-name-wrapper' },
+                                                        name
+                                                    ),
+                                                    icon && cardSymbol === sym ? _react2.default.createElement(_semanticUiReact.Icon, { onClick: function onClick(evt) {
+                                                            removeStock(evt); /*registerCardSymbol(evt); toggleIcon()*/
+                                                        },
+                                                        id: sym, className: 'icon', color: 'grey', name: 'delete' }) : ''
+                                                )
+                                            )
+                                        )
+                                    );
+                                })
+                            ),
+                            _react2.default.createElement(
+                                'div',
+                                { className: 'search-container' },
                                 _react2.default.createElement(
                                     'div',
-                                    { className: 'card-wrapper' },
+                                    { className: 'search-wrapper' },
+                                    _react2.default.createElement('input', { onChange: handleInput, onKeyDown: handleKeyDown, type: 'text', placeholder: 'Enter a stock symbol..', value: value }),
                                     _react2.default.createElement(
                                         'div',
-                                        { className: 'stock-card', id: sym },
-                                        _react2.default.createElement(
-                                            'div',
-                                            { className: 'stock-symbol-wrapper' },
-                                            sym
-                                        ),
-                                        _react2.default.createElement(
-                                            'div',
-                                            { className: 'stock-name-wrapper' },
-                                            name
-                                        ),
-                                        icon && cardSymbol === sym ? _react2.default.createElement(_semanticUiReact.Icon, { onClick: function onClick(evt) {
-                                                removeStock(evt); /*registerCardSymbol(evt); toggleIcon()*/
-                                            },
-                                            id: sym, className: 'icon', color: 'grey', name: 'delete' }) : ''
+                                        { className: 'button', onClick: handleSubmit },
+                                        'ADD'
+                                    )
+                                ),
+                                _react2.default.createElement(
+                                    'div',
+                                    { className: 'cards-full-container' },
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'cards-full-msg-wrapper' },
+                                        cardsFull ? 'Maximum number of chartable stocks reached.' : ''
+                                    ),
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'error-msg-wrapper' },
+                                        error ? 'Provided stock code didn\'t yield any results.' : ''
                                     )
                                 )
                             )
-                        );
-                    })
-                ),
-                _react2.default.createElement(
-                    'div',
-                    { className: 'search-container' },
-                    _react2.default.createElement(
-                        'div',
-                        { className: 'search-wrapper' },
-                        _react2.default.createElement('input', { onChange: handleInput, onKeyDown: handleKeyDown, type: 'text', placeholder: 'Enter a stock symbol..', value: value }),
-                        _react2.default.createElement(
-                            'div',
-                            { className: 'button', onClick: handleSubmit },
-                            'ADD'
                         )
                     ),
                     _react2.default.createElement(
-                        'div',
-                        { className: 'cards-full-container' },
+                        _reactRouterDom.Route,
+                        { path: '/' },
                         _react2.default.createElement(
                             'div',
-                            { className: 'cards-full-msg-wrapper' },
-                            cardsFull ? 'Maximum number of chartable stocks reached.' : ''
-                        ),
-                        _react2.default.createElement(
-                            'div',
-                            { className: 'error-msg-wrapper' },
-                            error ? 'Provided stock code didn\'t yield any results.' : ''
+                            { className: 'gloss' },
+                            _react2.default.createElement(
+                                'div',
+                                { className: 'logo-wrapper' },
+                                _react2.default.createElement(
+                                    _reactRouterDom.Link,
+                                    { to: '/' },
+                                    _react2.default.createElement('img', { src: '/img/logo2.png' })
+                                )
+                            ),
+                            _react2.default.createElement(
+                                'div',
+                                { className: 'view-chart-wrapper' },
+                                _react2.default.createElement(
+                                    _reactRouterDom.Link,
+                                    { to: '/chart' },
+                                    _react2.default.createElement('img', { src: '/img/line-chart2.png' }),
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'view-chart-text-wrapper' },
+                                        'View Chart'
+                                    )
+                                )
+                            ),
+                            _react2.default.createElement(
+                                _semanticUiReact.Sidebar,
+                                { animation: 'overlay', visible: visible, width: 'very wide' },
+                                _react2.default.createElement(
+                                    'div',
+                                    { className: 'about-container' },
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'about-text-wrapper' },
+                                        'About This App'
+                                    ),
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'tech-text-wrapper' },
+                                        'Front-end tech stack'
+                                    ),
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'front-end-logos-container logos-container' },
+                                        _react2.default.createElement(
+                                            'div',
+                                            { className: 'react-logo-wrapper logo-wrapper' },
+                                            _react2.default.createElement('img', { src: '/img/logos/react-logo.png' }),
+                                            _react2.default.createElement(
+                                                'div',
+                                                { className: 'logo-text-wrapper' },
+                                                'React'
+                                            )
+                                        ),
+                                        _react2.default.createElement(
+                                            'div',
+                                            { className: 'semantic-ui-logo-wrapper logo-wrapper' },
+                                            _react2.default.createElement('img', { src: '/img/logos/semantic-ui-logo.png' }),
+                                            _react2.default.createElement(
+                                                'div',
+                                                { className: 'logo-text-wrapper' },
+                                                'Semantic-UI-React'
+                                            )
+                                        )
+                                    ),
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'tech-text-wrapper' },
+                                        'Back-end tech stack'
+                                    ),
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'back-end-logos-container logos-container' },
+                                        _react2.default.createElement(
+                                            'div',
+                                            { className: 'nodejs-logo-wrapper logo-wrapper' },
+                                            _react2.default.createElement('img', { src: '/img/logos/nodejs-logo2.png' }),
+                                            _react2.default.createElement(
+                                                'div',
+                                                { className: 'logo-text-wrapper' },
+                                                'Node.js'
+                                            )
+                                        ),
+                                        _react2.default.createElement(
+                                            'div',
+                                            { className: 'logo-wrapper' },
+                                            _react2.default.createElement('img', { src: '/img/logos/expressjs-logo2.png' }),
+                                            _react2.default.createElement(
+                                                'div',
+                                                { className: 'logo-text-wrapper' },
+                                                'Express.js'
+                                            )
+                                        ),
+                                        _react2.default.createElement(
+                                            'div',
+                                            { className: 'mongodb-logo-wrapper logo-wrapper' },
+                                            _react2.default.createElement('img', { src: '/img/logos/mongodb-logo.png' }),
+                                            _react2.default.createElement(
+                                                'div',
+                                                { className: 'logo-text-wrapper' },
+                                                'MongoDBv'
+                                            )
+                                        )
+                                    ),
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'tech-text-wrapper' },
+                                        'API'
+                                    ),
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'api-logos-container logos-container' },
+                                        _react2.default.createElement(
+                                            'div',
+                                            { className: 'logo-wrapper' },
+                                            _react2.default.createElement('img', { src: '/img/logos/quandl-logo.png' }),
+                                            _react2.default.createElement(
+                                                'div',
+                                                { className: 'logo-text-wrapper' },
+                                                'Quandl'
+                                            )
+                                        )
+                                    ),
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'tech-text-wrapper' },
+                                        'Key modules'
+                                    ),
+                                    _react2.default.createElement(
+                                        'div',
+                                        { className: 'modules-logos-container logos-container' },
+                                        _react2.default.createElement(
+                                            'div',
+                                            { className: 'logo-wrapper' },
+                                            _react2.default.createElement('img', { src: '/img/logos/socketio-logo.gif' }),
+                                            _react2.default.createElement(
+                                                'div',
+                                                { className: 'logo-text-wrapper' },
+                                                'Socket.io'
+                                            )
+                                        ),
+                                        _react2.default.createElement(
+                                            'div',
+                                            { className: 'logo-wrapper' },
+                                            _react2.default.createElement('img', { src: '/img/logos/highcharts-logo.png' }),
+                                            _react2.default.createElement(
+                                                'div',
+                                                { className: 'logo-text-wrapper' },
+                                                'Highcharts'
+                                            )
+                                        )
+                                    )
+                                )
+                            ),
+                            !visible ? _react2.default.createElement(
+                                'div',
+                                { className: 'arrow', onClick: toggleSidebar },
+                                '>'
+                            ) : ''
                         )
                     )
                 )
-            );
+            )
+            // {/* <div className='app-container'>
+            //     <div className='chart-container'></div>
+            //     <div className='cards-container'>
+            //         {stockInfo.map((si, i) => {
+            //             const sym = si[0];
+            //             const name = si[1];
+            //             return (<div className='transition-wrapper' onMouseEnter={(evt) => {registerCardSymbol(evt); toggleIcon()}}
+            //                 onMouseLeave={(evt) => {deregisterCardSymbol(evt); toggleIconOff()}} id={sym} key={i} >
+            //                 <Transition animation='fade up' duration={300} transitionOnMount={true}>
+            //                     <div className='card-wrapper'>
+            //                         <div className='stock-card' id={sym} >
+            //                             <div className='stock-symbol-wrapper'>{sym}</div>
+            //                             <div className='stock-name-wrapper'>{name}</div>
+            //                             {icon && (cardSymbol === sym) ? <Icon onClick={(evt) => {removeStock(evt); /*registerCardSymbol(evt); toggleIcon()*/}}
+            //                                 id={sym} className='icon' color='grey' name='delete'></Icon> : ''}
+            //                         </div>
+            //                     </div>
+            //                 </Transition>
+            //             </div>)
+            //         })}
+            //     </div>
+            //
+            //     <div className='search-container'>
+            //         <div className='search-wrapper'>
+            //             <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
+            //             <div className='button' onClick={handleSubmit}>ADD</div>
+            //         </div>
+            //         <div className='cards-full-container'>
+            //             <div className='cards-full-msg-wrapper'>{cardsFull ? 'Maximum number of chartable stocks reached.' : ''}</div>
+            //             <div className='error-msg-wrapper'>{error ? 'Provided stock code didn\'t yield any results.' : ''}</div>
+            //         </div>
+            //     </div>
+            //
+            // </div> */}
+            ;
         }
     }]);
 

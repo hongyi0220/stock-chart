@@ -6,24 +6,96 @@ html {
   margin: 0; }
   html body {
     background-color: black; }
-  html .app-container {
+  html .container-all .logo-wrapper img {
+    height: 100px; }
+  html .container-all .logo-wrapper:hover {
+    cursor: hand; }
+  html .container-all .gloss {
+    position: absolute;
+    background: url("/img/stock.jpeg") no-repeat center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; }
+    html .container-all .gloss .view-chart-wrapper {
+      position: relative;
+      text-align: center;
+      top: 50%;
+      transform: translateY(-155px); }
+      html .container-all .gloss .view-chart-wrapper img {
+        height: 80px; }
+        html .container-all .gloss .view-chart-wrapper img:hover {
+          cursor: hand; }
+      html .container-all .gloss .view-chart-wrapper .view-chart-text-wrapper {
+        color: white; }
+        html .container-all .gloss .view-chart-wrapper .view-chart-text-wrapper:hover {
+          cursor: hand; }
+    html .container-all .gloss .sidebar {
+      background: rgba(0, 0, 0, 0.5);
+      color: white; }
+      html .container-all .gloss .sidebar .about-container {
+        position: relative;
+        text-align: center;
+        height: 390px;
+        top: 50%;
+        transform: translateY(-200px); }
+        html .container-all .gloss .sidebar .about-container .about-text-wrapper {
+          margin-bottom: 1.5em;
+          font-size: 1.9em; }
+        html .container-all .gloss .sidebar .about-container .tech-text-wrapper {
+          font-size: 1.3em; }
+        html .container-all .gloss .sidebar .about-container .logos-container {
+          font-size: 1em; }
+          html .container-all .gloss .sidebar .about-container .logos-container .logo-wrapper {
+            margin: .3em;
+            padding: 0 .5em 0 .5em;
+            display: inline-block;
+            background: #323232;
+            border-radius: 5px; }
+            html .container-all .gloss .sidebar .about-container .logos-container .logo-wrapper .logo-text-wrapper {
+              display: inline-block;
+              height: 50px;
+              line-height: 50px; }
+            html .container-all .gloss .sidebar .about-container .logos-container .logo-wrapper img {
+              height: 50px; }
+          html .container-all .gloss .sidebar .about-container .logos-container .react-logo-wrapper {
+            padding: 0 1em 0 0em; }
+          html .container-all .gloss .sidebar .about-container .logos-container .nodejs-logo-wrapper {
+            padding: 0 .8em 0 0em; }
+          html .container-all .gloss .sidebar .about-container .logos-container .mongodb-logo-wrapper {
+            padding: 0 .9em 0 0em; }
+          html .container-all .gloss .sidebar .about-container .logos-container .logo-wrapper > * {
+            vertical-align: top; }
+    html .container-all .gloss .arrow {
+      position: absolute;
+      display: inline-block;
+      top: 50%;
+      width: 32px;
+      height: 32px;
+      transform: translateY(-16px);
+      color: white;
+      font-size: 4em; }
+      html .container-all .gloss .arrow:hover {
+        color: teal;
+        cursor: pointer; }
+  html .container-all .app-container {
     background-color: black; }
-    html .app-container .chart-container {
+    html .container-all .app-container .chart-container {
       margin: auto;
       margin-top: 3em;
       width: 80%;
       height: 400px; }
-    html .app-container .cards-container {
+    html .container-all .app-container .cards-container {
       margin: auto;
       margin-top: 2em;
       width: 80%; }
-      html .app-container .cards-container .transition-wrapper {
+      html .container-all .app-container .cards-container .transition-wrapper {
         display: inline-block;
         margin: 0.2em;
         width: 150px;
         height: 90px;
         vertical-align: top; }
-        html .app-container .cards-container .transition-wrapper .card-wrapper {
+        html .container-all .app-container .cards-container .transition-wrapper .card-wrapper {
           position: relative;
           border: 1px solid grey;
           border-radius: 2px;
@@ -32,7 +104,7 @@ html {
           margin: auto;
           top: 50%;
           transform: translateY(-40px); }
-          html .app-container .cards-container .transition-wrapper .card-wrapper .stock-card {
+          html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .stock-card {
             text-align: center;
             border-left: 3px solid #00f72c;
             border-top-left-radius: 1px;
@@ -41,30 +113,30 @@ html {
             height: 78px;
             transition: all 0.3s ease;
             color: white; }
-            html .app-container .cards-container .transition-wrapper .card-wrapper .stock-card:hover {
+            html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .stock-card:hover {
               border-left: 5px solid red;
               border-top-left-radius: 1px;
               border-bottom-left-radius: 2px; }
-            html .app-container .cards-container .transition-wrapper .card-wrapper .stock-card .stock-symbol-wrapper {
+            html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .stock-card .stock-symbol-wrapper {
               height: 19.5px; }
-            html .app-container .cards-container .transition-wrapper .card-wrapper .stock-card .stock-name-wrapper {
+            html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .stock-card .stock-name-wrapper {
               height: 58.5px; }
-          html .app-container .cards-container .transition-wrapper .card-wrapper .icon {
+          html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .icon {
             position: absolute;
             top: 0;
             right: 0; }
-            html .app-container .cards-container .transition-wrapper .card-wrapper .icon:hover {
+            html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .icon:hover {
               cursor: pointer; }
-    html .app-container .search-container {
+    html .container-all .app-container .search-container {
       width: 100%;
       margin: 2em 0 2em 0; }
-      html .app-container .search-container .search-wrapper {
+      html .container-all .app-container .search-container .search-wrapper {
         height: 40px;
         margin: auto;
         width: 60%;
         display: flex;
         flex-direction: row; }
-        html .app-container .search-container .search-wrapper input {
+        html .container-all .app-container .search-container .search-wrapper input {
           flex-grow: 8.5;
           border: 2px solid grey;
           height: 100%;
@@ -74,13 +146,13 @@ html {
           padding-left: 1em;
           background-color: black;
           transition: all 0.2s ease; }
-          html .app-container .search-container .search-wrapper input:focus {
+          html .container-all .app-container .search-container .search-wrapper input:focus {
             outline: none;
             border: 1px solid white;
             color: white; }
-            html .app-container .search-container .search-wrapper input:focus::placeholder {
+            html .container-all .app-container .search-container .search-wrapper input:focus::placeholder {
               color: white; }
-        html .app-container .search-container .search-wrapper .button {
+        html .container-all .app-container .search-container .search-wrapper .button {
           border: 2px solid grey;
           height: 100%;
           border-top-right-radius: 5px;
@@ -90,17 +162,17 @@ html {
           text-align: center;
           color: grey;
           transition: all 0.2s ease; }
-          html .app-container .search-container .search-wrapper .button:hover {
+          html .container-all .app-container .search-container .search-wrapper .button:hover {
             border: 1px solid white;
             color: white;
             cursor: pointer; }
-      html .app-container .search-container .cards-full-container {
+      html .container-all .app-container .search-container .cards-full-container {
         width: 100%; }
-        html .app-container .search-container .cards-full-container .cards-full-msg-wrapper {
+        html .container-all .app-container .search-container .cards-full-container .cards-full-msg-wrapper {
           width: 60%;
           margin: auto;
           color: white; }
-        html .app-container .search-container .cards-full-container .error-msg-wrapper {
+        html .container-all .app-container .search-container .cards-full-container .error-msg-wrapper {
           width: 60%;
           margin: auto;
           color: white; }
