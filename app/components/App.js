@@ -18,7 +18,8 @@ class App extends React.Component {
             cardColor: 'green',
             icon: false,
             cardSymbol: null,
-            cardsFull: false
+            cardsFull: false,
+            error: null
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInput = this.handleInput.bind(this);
@@ -46,12 +47,24 @@ class App extends React.Component {
         .then(resJson => {
             const index = resJson.dataset.name.indexOf('(');
             const stockName = resJson.dataset.name.slice(0, index).trim();
-
-            state.stockNames.push(stockName);
-            this.setState({ state }, () => console.log('state after getting stockName:', this.state));
-            return stockName;
+            const paddedStockName = addPadding(stockName, 25);
+            console.log('paddedStockName, length', paddedStockName, paddedStockName.length);
+            state.stockNames.push(paddedStockName);
+            this.setState({ state }/*, () => console.log('state after getting stockName:', this.state)*/);
+            return paddedStockName;
         })
         .catch(err => console.error(err));
+
+        function addPadding(text, maxLength) {
+            let padding = '';
+            if (text.length < maxLength) {
+                for (let i = 0; i < maxLength - text.length; i++) {
+                    padding += ' ';
+                }
+            }
+            console.log('padding lenth', padding.length);
+            return text + padding;
+        }
     }
 
     getData(stockSymbol) {
@@ -68,18 +81,21 @@ class App extends React.Component {
             // console.log('resJson:', resJson);
 
             let stockData = state.stockData;
+            // let error = state.error;
 
             if (resJson['quandl_error']) {
                 throw new Error(resJson['quandl_error'].message);
             }
             const transformedData = transformData(resJson);
 
-            stockData.push(transformedData)
-            this.setState({state}/*, () => console.log('state after setState @ getData:', this.state)*/);
+            stockData.push(transformedData);
+            // error = false;
+            this.setState({stockData: stockData, error: false}/*, () => console.log('state after setState @ getData:', this.state)*/);
             return transformedData;
         })
         .catch(err => {
-            console.log(err);
+            console.error(err);
+            this.setState({error: true});
             return false;
         });
 
@@ -147,9 +163,9 @@ class App extends React.Component {
                     .then(name => {
                         const packaged = packaging(name);
                         this.setState({ state }, () => {
-                            console.log('symbols to emit:', this.state.stockSymbols);
-                            console.log('names to emit:', this.state.stockNames);
-                            console.log('data to emit:', this.state.stockData);
+                            // console.log('symbols to emit:', this.state.stockSymbols);
+                            // console.log('names to emit:', this.state.stockNames);
+                            // console.log('data to emit:', this.state.stockData);
                             socket.emit('stock symbols', this.state.stockSymbols);
                             socket.emit('stock names', this.state.stockNames);
                             socket.emit('stock data', this.state.stockData);
@@ -302,14 +318,14 @@ class App extends React.Component {
         // console.log('toggledIcon');
         this.setState({
             icon: true
-        }, () => console.log('icon on?:', this.state.icon));
+        }/*, () => console.log('icon on?:', this.state.icon)*/);
     }
 
     toggleIconOff() {
         // console.log('toggledIcon OFF');
         this.setState({
             icon: false
-        }, () => console.log('icon on?:', this.state.icon));
+        }/*, () => console.log('icon on?:', this.state.icon)*/);
     }
 
     registerCardSymbol(evt) {
@@ -407,7 +423,7 @@ class App extends React.Component {
         const stockNames = this.state.stockNames;
         const stockInfo = stockSymbols.map((sym,i) => [sym, stockNames[i]]);
         const cardsFull = this.state.cardsFull;
-
+        const error = this.state.error;
 
         return (
             <div className='app-container'>
@@ -437,8 +453,12 @@ class App extends React.Component {
                         <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
                         <div className='button' onClick={handleSubmit}>ADD</div>
                     </div>
+                    <div className='cards-full-container'>
+                        <div className='cards-full-msg-wrapper'>{cardsFull ? 'Maximum number of chartable stocks reached.' : ''}</div>
+                        <div className='error-msg-wrapper'>{error ? 'Provided stock code didn\'t yield any results.' : ''}</div>
+                    </div>
                 </div>
-                <div className='cards-full-wrapper'><p>{cardsFull ? 'Maximum number of chartable stocks reached.' : ''}</p></div>
+
             </div>
         );
     }

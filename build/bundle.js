@@ -45961,7 +45961,8 @@ var App = function (_React$Component) {
             cardColor: 'green',
             icon: false,
             cardSymbol: null,
-            cardsFull: false
+            cardsFull: false,
+            error: null
         };
         _this.handleSubmit = _this.handleSubmit.bind(_this);
         _this.handleInput = _this.handleInput.bind(_this);
@@ -45994,15 +45995,25 @@ var App = function (_React$Component) {
             }).then(function (resJson) {
                 var index = resJson.dataset.name.indexOf('(');
                 var stockName = resJson.dataset.name.slice(0, index).trim();
-
-                state.stockNames.push(stockName);
-                _this2.setState({ state: state }, function () {
-                    return console.log('state after getting stockName:', _this2.state);
-                });
-                return stockName;
+                var paddedStockName = addPadding(stockName, 25);
+                console.log('paddedStockName, length', paddedStockName, paddedStockName.length);
+                state.stockNames.push(paddedStockName);
+                _this2.setState({ state: state /*, () => console.log('state after getting stockName:', this.state)*/ });
+                return paddedStockName;
             }).catch(function (err) {
                 return console.error(err);
             });
+
+            function addPadding(text, maxLength) {
+                var padding = '';
+                if (text.length < maxLength) {
+                    for (var i = 0; i < maxLength - text.length; i++) {
+                        padding += ' ';
+                    }
+                }
+                console.log('padding lenth', padding.length);
+                return text + padding;
+            }
         }
     }, {
         key: 'getData',
@@ -46021,6 +46032,7 @@ var App = function (_React$Component) {
                 // console.log('resJson:', resJson);
 
                 var stockData = state.stockData;
+                // let error = state.error;
 
                 if (resJson['quandl_error']) {
                     throw new Error(resJson['quandl_error'].message);
@@ -46028,10 +46040,12 @@ var App = function (_React$Component) {
                 var transformedData = transformData(resJson);
 
                 stockData.push(transformedData);
-                _this3.setState({ state: state /*, () => console.log('state after setState @ getData:', this.state)*/ });
+                // error = false;
+                _this3.setState({ stockData: stockData, error: false /*, () => console.log('state after setState @ getData:', this.state)*/ });
                 return transformedData;
             }).catch(function (err) {
-                console.log(err);
+                console.error(err);
+                _this3.setState({ error: true });
                 return false;
             });
 
@@ -46102,9 +46116,9 @@ var App = function (_React$Component) {
                         _this4.getStockName(symbol).then(function (name) {
                             var packaged = packaging(name);
                             _this4.setState({ state: state }, function () {
-                                console.log('symbols to emit:', _this4.state.stockSymbols);
-                                console.log('names to emit:', _this4.state.stockNames);
-                                console.log('data to emit:', _this4.state.stockData);
+                                // console.log('symbols to emit:', this.state.stockSymbols);
+                                // console.log('names to emit:', this.state.stockNames);
+                                // console.log('data to emit:', this.state.stockData);
                                 socket.emit('stock symbols', _this4.state.stockSymbols);
                                 socket.emit('stock names', _this4.state.stockNames);
                                 socket.emit('stock data', _this4.state.stockData);
@@ -46268,26 +46282,16 @@ var App = function (_React$Component) {
     }, {
         key: 'toggleIcon',
         value: function toggleIcon() {
-            var _this6 = this;
-
             // console.log('toggledIcon');
             this.setState({
-                icon: true
-            }, function () {
-                return console.log('icon on?:', _this6.state.icon);
-            });
+                icon: true /*, () => console.log('icon on?:', this.state.icon)*/ });
         }
     }, {
         key: 'toggleIconOff',
         value: function toggleIconOff() {
-            var _this7 = this;
-
             // console.log('toggledIcon OFF');
             this.setState({
-                icon: false
-            }, function () {
-                return console.log('icon on?:', _this7.state.icon);
-            });
+                icon: false /*, () => console.log('icon on?:', this.state.icon)*/ });
         }
     }, {
         key: 'registerCardSymbol',
@@ -46310,7 +46314,7 @@ var App = function (_React$Component) {
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this8 = this;
+            var _this6 = this;
 
             // console.log('componentDidMount');
             var socket = (0, _socket2.default)();
@@ -46319,17 +46323,17 @@ var App = function (_React$Component) {
 
             socket.on('stock symbols', function (symbols) {
                 // console.log('socket.on symbols:', symbols);
-                _this8.setState({ stockSymbols: symbols });
+                _this6.setState({ stockSymbols: symbols });
             });
             socket.on('stock names', function (names) {
                 // console.log('socket.on names:', names);
-                _this8.setState({ stockNames: names });
+                _this6.setState({ stockNames: names });
             });
             socket.on('stock data', function (stockData) {
 
-                var stockSymbols = _this8.state.stockSymbols;
-                _this8.setState({ stockData: stockData });
-                var build = _this8.buildChart(chartContainer);
+                var stockSymbols = _this6.state.stockSymbols;
+                _this6.setState({ stockData: stockData });
+                var build = _this6.buildChart(chartContainer);
                 // Using inner function's closure over the argument chartContainer
                 build(stockData, stockSymbols);
                 // console.log('setState @ compDidMnt:', this.state);
@@ -46350,9 +46354,9 @@ var App = function (_React$Component) {
                     localStorage.setItem('visited', 'true');
                     // console.log('stockData, stockSymbols:', stockData, stockSymbols);
                     this.getStockData().then(function (packaged) {
-                        var build = _this8.buildChart(chartContainer);
+                        var build = _this6.buildChart(chartContainer);
                         // console.log('does chartContainer exist inside the scope of a promise?:', chartContainer);
-                        _this8.unpackData(packaged, build);
+                        _this6.unpackData(packaged, build);
                     }).catch(function (err) {
                         return console.error(err);
                     });
@@ -46390,6 +46394,7 @@ var App = function (_React$Component) {
                 return [sym, stockNames[i]];
             });
             var cardsFull = this.state.cardsFull;
+            var error = this.state.error;
 
             return _react2.default.createElement(
                 'div',
@@ -46450,15 +46455,20 @@ var App = function (_React$Component) {
                             { className: 'button', onClick: handleSubmit },
                             'ADD'
                         )
-                    )
-                ),
-                _react2.default.createElement(
-                    'div',
-                    { className: 'cards-full-wrapper' },
+                    ),
                     _react2.default.createElement(
-                        'p',
-                        null,
-                        cardsFull ? 'Maximum number of chartable stocks reached.' : ''
+                        'div',
+                        { className: 'cards-full-container' },
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'cards-full-msg-wrapper' },
+                            cardsFull ? 'Maximum number of chartable stocks reached.' : ''
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'error-msg-wrapper' },
+                            error ? 'Provided stock code didn\'t yield any results.' : ''
+                        )
                     )
                 )
             );

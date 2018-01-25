@@ -21,7 +21,8 @@ html {
         display: inline-block;
         margin: 0.2em;
         width: 150px;
-        height: 90px; }
+        height: 90px;
+        vertical-align: top; }
         html .app-container .cards-container .transition-wrapper .card-wrapper {
           position: relative;
           border: 1px solid grey;
@@ -44,21 +45,19 @@ html {
               border-left: 5px solid red;
               border-top-left-radius: 1px;
               border-bottom-left-radius: 2px; }
+            html .app-container .cards-container .transition-wrapper .card-wrapper .stock-card .stock-symbol-wrapper {
+              height: 19.5px; }
+            html .app-container .cards-container .transition-wrapper .card-wrapper .stock-card .stock-name-wrapper {
+              height: 58.5px; }
           html .app-container .cards-container .transition-wrapper .card-wrapper .icon {
             position: absolute;
             top: 0;
             right: 0; }
             html .app-container .cards-container .transition-wrapper .card-wrapper .icon:hover {
               cursor: pointer; }
-    html .app-container .cards-full-wrapper {
-      margin-bottom: 1.5em; }
-      html .app-container .cards-full-wrapper p {
-        text-align: center;
-        color: white; }
     html .app-container .search-container {
-      margin: auto;
       width: 100%;
-      margin: 2em 0 0 0; }
+      margin: 2em 0 2em 0; }
       html .app-container .search-container .search-wrapper {
         height: 40px;
         margin: auto;
@@ -95,3 +94,13 @@ html {
             border: 1px solid white;
             color: white;
             cursor: pointer; }
+      html .app-container .search-container .cards-full-container {
+        width: 100%; }
+        html .app-container .search-container .cards-full-container .cards-full-msg-wrapper {
+          width: 60%;
+          margin: auto;
+          color: white; }
+        html .app-container .search-container .cards-full-container .error-msg-wrapper {
+          width: 60%;
+          margin: auto;
+          color: white; }
