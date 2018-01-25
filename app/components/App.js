@@ -353,7 +353,8 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        // console.log('componentDidMount');
+        console.log('componentDidMount');
+        console.log('history:', this.props.history);
         const socket = socketIOClient();
         // console.log('socket:', socket);
         const chartContainer = document.querySelector('.chart-container');
@@ -381,9 +382,12 @@ class App extends React.Component {
         const stockSymbols = state.stockSymbols;
         const stockData = state.stockData;
 
+        const pathname = this.props.history.location.pathname;
+        const onHomepage = pathname === '/';
+
         // Code below ensures if user is reloading page or visiting the page for the first time,
         // previous searched stock info is retrieved and displayed
-        if (localStorage) {
+        if (localStorage && !onHomepage) {
             // console.log('has localStorage');
             const visited = localStorage.getItem('visited');
             if (!visited) {
