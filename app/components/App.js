@@ -2,7 +2,7 @@ import React from 'react';
 import { withRouter, Route, Switch } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 import Highcharts from 'highcharts/highstock';
-import { Transition, Icon } from 'semantic-ui-react';
+import { Transition, Icon, Sidebar } from 'semantic-ui-react';
 import { theme } from './theme';
 
 class App extends React.Component {
@@ -19,7 +19,8 @@ class App extends React.Component {
             icon: false,
             cardSymbol: null,
             cardsFull: false,
-            error: null
+            error: null,
+            sidebar: false
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInput = this.handleInput.bind(this);
@@ -34,6 +35,7 @@ class App extends React.Component {
         this.registerCardSymbol = this.registerCardSymbol.bind(this);
         this.deregisterCardSymbol = this.deregisterCardSymbol.bind(this);
         this.getStockName = this.getStockName.bind(this);
+        this.toggleSidebar = this.toggleSidebar.bind(this);
     }
 
     getStockName(stockSymbol) {
@@ -346,6 +348,10 @@ class App extends React.Component {
         }/*, () => console.log('cardSymbol after de-registering:', this.state.cardSymbol)*/);
     }
 
+    toggleSidebar() {
+        this.setState({sidebar: !this.state.sidebar});
+    }
+
     componentDidMount() {
         // console.log('componentDidMount');
         const socket = socketIOClient();
@@ -424,42 +430,84 @@ class App extends React.Component {
         const stockInfo = stockSymbols.map((sym,i) => [sym, stockNames[i]]);
         const cardsFull = this.state.cardsFull;
         const error = this.state.error;
+        const toggleSidebar = this.toggleSidebar;
+        const visible = this.state.sidebar;
 
         return (
-            <div className='app-container'>
-                <div className='chart-container'></div>
-                <div className='cards-container'>
-                    {stockInfo.map((si, i) => {
-                        const sym = si[0];
-                        const name = si[1];
-                        return (<div className='transition-wrapper' onMouseEnter={(evt) => {registerCardSymbol(evt); toggleIcon()}}
-                            onMouseLeave={(evt) => {deregisterCardSymbol(evt); toggleIconOff()}} id={sym} key={i} >
-                            <Transition animation='fade up' duration={300} transitionOnMount={true}>
-                                <div className='card-wrapper'>
-                                    <div className='stock-card' id={sym} >
-                                        <div className='stock-symbol-wrapper'>{sym}</div>
-                                        <div className='stock-name-wrapper'>{name}</div>
-                                        {icon && (cardSymbol === sym) ? <Icon onClick={(evt) => {removeStock(evt); /*registerCardSymbol(evt); toggleIcon()*/}}
-                                            id={sym} className='icon' color='grey' name='delete'></Icon> : ''}
+            <div onClick={() => {if (visible) toggleSidebar()}} className='container-all'>
+                <div className='gloss'>
+                    <Sidebar animation='overlay' visible={visible} width='wide'>hello</Sidebar>
+                    <div className='arrow' onClick={toggleSidebar}>></div>
+                </div>
+                <div className='app-container'>
+                    <div className='chart-container'></div>
+                    <div className='cards-container'>
+                        {stockInfo.map((si, i) => {
+                            const sym = si[0];
+                            const name = si[1];
+                            return (<div className='transition-wrapper' onMouseEnter={(evt) => {registerCardSymbol(evt); toggleIcon()}}
+                                onMouseLeave={(evt) => {deregisterCardSymbol(evt); toggleIconOff()}} id={sym} key={i} >
+                                <Transition animation='fade up' duration={300} transitionOnMount={true}>
+                                    <div className='card-wrapper'>
+                                        <div className='stock-card' id={sym} >
+                                            <div className='stock-symbol-wrapper'>{sym}</div>
+                                            <div className='stock-name-wrapper'>{name}</div>
+                                            {icon && (cardSymbol === sym) ? <Icon onClick={(evt) => {removeStock(evt); /*registerCardSymbol(evt); toggleIcon()*/}}
+                                                id={sym} className='icon' color='grey' name='delete'></Icon> : ''}
+                                        </div>
                                     </div>
-                                </div>
-                            </Transition>
-                        </div>)
-                    })}
-                </div>
-
-                <div className='search-container'>
-                    <div className='search-wrapper'>
-                        <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
-                        <div className='button' onClick={handleSubmit}>ADD</div>
+                                </Transition>
+                            </div>)
+                        })}
                     </div>
-                    <div className='cards-full-container'>
-                        <div className='cards-full-msg-wrapper'>{cardsFull ? 'Maximum number of chartable stocks reached.' : ''}</div>
-                        <div className='error-msg-wrapper'>{error ? 'Provided stock code didn\'t yield any results.' : ''}</div>
-                    </div>
-                </div>
 
+                    <div className='search-container'>
+                        <div className='search-wrapper'>
+                            <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
+                            <div className='button' onClick={handleSubmit}>ADD</div>
+                        </div>
+                        <div className='cards-full-container'>
+                            <div className='cards-full-msg-wrapper'>{cardsFull ? 'Maximum number of chartable stocks reached.' : ''}</div>
+                            <div className='error-msg-wrapper'>{error ? 'Provided stock code didn\'t yield any results.' : ''}</div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
+            // {/* <div className='app-container'>
+            //     <div className='chart-container'></div>
+            //     <div className='cards-container'>
+            //         {stockInfo.map((si, i) => {
+            //             const sym = si[0];
+            //             const name = si[1];
+            //             return (<div className='transition-wrapper' onMouseEnter={(evt) => {registerCardSymbol(evt); toggleIcon()}}
+            //                 onMouseLeave={(evt) => {deregisterCardSymbol(evt); toggleIconOff()}} id={sym} key={i} >
+            //                 <Transition animation='fade up' duration={300} transitionOnMount={true}>
+            //                     <div className='card-wrapper'>
+            //                         <div className='stock-card' id={sym} >
+            //                             <div className='stock-symbol-wrapper'>{sym}</div>
+            //                             <div className='stock-name-wrapper'>{name}</div>
+            //                             {icon && (cardSymbol === sym) ? <Icon onClick={(evt) => {removeStock(evt); /*registerCardSymbol(evt); toggleIcon()*/}}
+            //                                 id={sym} className='icon' color='grey' name='delete'></Icon> : ''}
+            //                         </div>
+            //                     </div>
+            //                 </Transition>
+            //             </div>)
+            //         })}
+            //     </div>
+            //
+            //     <div className='search-container'>
+            //         <div className='search-wrapper'>
+            //             <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
+            //             <div className='button' onClick={handleSubmit}>ADD</div>
+            //         </div>
+            //         <div className='cards-full-container'>
+            //             <div className='cards-full-msg-wrapper'>{cardsFull ? 'Maximum number of chartable stocks reached.' : ''}</div>
+            //             <div className='error-msg-wrapper'>{error ? 'Provided stock code didn\'t yield any results.' : ''}</div>
+            //         </div>
+            //     </div>
+            //
+            // </div> */}
         );
     }
 }
