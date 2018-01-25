@@ -2,7 +2,8 @@ import React from 'react';
 import { withRouter, Route, Switch } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 import Highcharts from 'highcharts/highstock';
-import { Button, Transition, Icon } from 'semantic-ui-react';
+import { Transition, Icon } from 'semantic-ui-react';
+import { theme } from './theme';
 
 class App extends React.Component {
     constructor() {
@@ -16,7 +17,8 @@ class App extends React.Component {
             packaged: null,
             cardColor: 'green',
             icon: false,
-            cardSymbol: null
+            cardSymbol: null,
+            cardsFull: false
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInput = this.handleInput.bind(this);
@@ -59,16 +61,6 @@ class App extends React.Component {
         const dataAPI = apiRoot + stockSymbol + '/data.json' + api_key;
         // const metadataAPI = apiRoot + stockSymbol + '/metadata.json' + api_key;
         const state = {...this.state};
-        //
-        // fetch(metadataAPI)
-        // .then(res => res.json())
-        // .then(resJson => {
-        //     const index = resJson.dataset.name.indexOf('(');
-        //     const stockName = resJson.dataset.name.slice(0, index).trim();
-        //     state.stockNames.push(stockName);
-        //     this.setState({ state }, () => console.log('state after getting stockName:', this.state))
-        // })
-        // .catch(err => console.error(err));
 
         return fetch(dataAPI)
         .then(res => res.json())
@@ -136,8 +128,13 @@ class App extends React.Component {
             }
             return false;
         }
+
+        const hasTen = stockSymbols.length > 9;
+        this.setState({cardsFull: hasTen});
+
         this.setState({ input: '' });
-        if (!hasSymbol(symbol)) {
+
+        if (!hasSymbol(symbol) && !hasTen) {
             this.getData(symbol)
             .then(stockDatum => {
                 // console.log('result:', result);
@@ -190,7 +187,7 @@ class App extends React.Component {
                     selected: 1
                 },
                 title:  {
-                    text: 'Stock'
+                    text: 'Stock Chart'
                 },
                 series: series
             });
@@ -385,7 +382,11 @@ class App extends React.Component {
         window.onbeforeunload = function() {
             localStorage.removeItem('visited');
         }
+        Highcharts.theme = theme();
+        Highcharts.setOptions(Highcharts.theme);
 
+        // const hasTen = stockSymbols.length > 9;
+        // this.setState({cardsFull: hasTen});
     }
 
     render() {
@@ -405,6 +406,7 @@ class App extends React.Component {
         const cardSymbol = this.state.cardSymbol;
         const stockNames = this.state.stockNames;
         const stockInfo = stockSymbols.map((sym,i) => [sym, stockNames[i]]);
+        const cardsFull = this.state.cardsFull;
 
 
         return (
@@ -416,7 +418,7 @@ class App extends React.Component {
                         const name = si[1];
                         return (<div className='transition-wrapper' onMouseEnter={(evt) => {registerCardSymbol(evt); toggleIcon()}}
                             onMouseLeave={(evt) => {deregisterCardSymbol(evt); toggleIconOff()}} id={sym} key={i} >
-                            <Transition animation='fade up' duration={800} transitionOnMount={true}>
+                            <Transition animation='fade up' duration={300} transitionOnMount={true}>
                                 <div className='card-wrapper'>
                                     <div className='stock-card' id={sym} >
                                         <div className='stock-symbol-wrapper'>{sym}</div>
@@ -429,12 +431,14 @@ class App extends React.Component {
                         </div>)
                     })}
                 </div>
+
                 <div className='search-container'>
                     <div className='search-wrapper'>
                         <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
-                        <Button className='button' basic color='grey' onClick={handleSubmit}>Add</Button>
+                        <div className='button' onClick={handleSubmit}>ADD</div>
                     </div>
                 </div>
+                <div className='cards-full-wrapper'><p>{cardsFull ? 'Maximum number of chartable stocks reached.' : ''}</p></div>
             </div>
         );
     }

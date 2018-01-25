@@ -24982,7 +24982,7 @@ StatisticValue.create = Object(__WEBPACK_IMPORTED_MODULE_4__lib__["m" /* createS
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(420);
-module.exports = __webpack_require__(822);
+module.exports = __webpack_require__(823);
 
 
 /***/ }),
@@ -45934,6 +45934,8 @@ var _highstock2 = _interopRequireDefault(_highstock);
 
 var _semanticUiReact = __webpack_require__(483);
 
+var _theme = __webpack_require__(822);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -45958,7 +45960,8 @@ var App = function (_React$Component) {
             packaged: null,
             cardColor: 'green',
             icon: false,
-            cardSymbol: null
+            cardSymbol: null,
+            cardsFull: false
         };
         _this.handleSubmit = _this.handleSubmit.bind(_this);
         _this.handleInput = _this.handleInput.bind(_this);
@@ -46011,16 +46014,6 @@ var App = function (_React$Component) {
             var dataAPI = apiRoot + stockSymbol + '/data.json' + api_key;
             // const metadataAPI = apiRoot + stockSymbol + '/metadata.json' + api_key;
             var state = _extends({}, this.state);
-            //
-            // fetch(metadataAPI)
-            // .then(res => res.json())
-            // .then(resJson => {
-            //     const index = resJson.dataset.name.indexOf('(');
-            //     const stockName = resJson.dataset.name.slice(0, index).trim();
-            //     state.stockNames.push(stockName);
-            //     this.setState({ state }, () => console.log('state after getting stockName:', this.state))
-            // })
-            // .catch(err => console.error(err));
 
             return fetch(dataAPI).then(function (res) {
                 return res.json();
@@ -46092,8 +46085,13 @@ var App = function (_React$Component) {
                 }
                 return false;
             }
+
+            var hasTen = stockSymbols.length > 9;
+            this.setState({ cardsFull: hasTen });
+
             this.setState({ input: '' });
-            if (!hasSymbol(symbol)) {
+
+            if (!hasSymbol(symbol) && !hasTen) {
                 this.getData(symbol).then(function (stockDatum) {
                     // console.log('result:', result);
                     // console.log('!hasSymbol:', !hasSymbol(symbol));
@@ -46150,7 +46148,7 @@ var App = function (_React$Component) {
                         selected: 1
                     },
                     title: {
-                        text: 'Stock'
+                        text: 'Stock Chart'
                     },
                     series: series
                 });
@@ -46171,8 +46169,6 @@ var App = function (_React$Component) {
     }, {
         key: 'unpackData',
         value: function unpackData(data, fn) {
-            var _this5 = this;
-
             var stockSymbols = [];
             var stockData = [];
             var stockNames = [];
@@ -46193,7 +46189,7 @@ var App = function (_React$Component) {
                 }, function () {
                     // This fn already has chartContainer passed-in as an argument
                     if (fn) fn(stockData, stockSymbols);
-                    console.log('state after unpacking:', _this5.state);
+                    // console.log('state after unpacking:', this.state)
                 });
             }
         }
@@ -46222,7 +46218,7 @@ var App = function (_React$Component) {
     }, {
         key: 'getStockData',
         value: function getStockData() {
-            console.log('getStockData triggered');
+            // console.log('getStockData triggered');
             var apiUrl = 'http://localhost:8080/getstock';
             return fetch(apiUrl).then(function (res) {
                 return res.json();
@@ -46237,7 +46233,7 @@ var App = function (_React$Component) {
     }, {
         key: 'removeStock',
         value: function removeStock(evt) {
-            var _this6 = this;
+            var _this5 = this;
 
             var socket = (0, _socket2.default)();
             var symbol = evt.target.id;
@@ -46263,68 +46259,58 @@ var App = function (_React$Component) {
 
             this.setState({ state: state }, function () {
                 // console.log('state after removeStock:', this.state);
-                socket.emit('stock symbols', _this6.state.stockSymbols);
-                socket.emit('stock names', _this6.state.stockNames);
-                socket.emit('stock data', _this6.state.stockData);
+                socket.emit('stock symbols', _this5.state.stockSymbols);
+                socket.emit('stock names', _this5.state.stockNames);
+                socket.emit('stock data', _this5.state.stockData);
             });
             this.buildChart(document.querySelector('.chart-container'))();
         }
     }, {
         key: 'toggleIcon',
         value: function toggleIcon() {
-            var _this7 = this;
+            var _this6 = this;
 
-            console.log('toggledIcon');
+            // console.log('toggledIcon');
             this.setState({
                 icon: true
             }, function () {
-                return console.log('icon on?:', _this7.state.icon);
+                return console.log('icon on?:', _this6.state.icon);
             });
         }
     }, {
         key: 'toggleIconOff',
         value: function toggleIconOff() {
-            var _this8 = this;
+            var _this7 = this;
 
-            console.log('toggledIcon OFF');
+            // console.log('toggledIcon OFF');
             this.setState({
                 icon: false
             }, function () {
-                return console.log('icon on?:', _this8.state.icon);
+                return console.log('icon on?:', _this7.state.icon);
             });
         }
     }, {
         key: 'registerCardSymbol',
         value: function registerCardSymbol(evt) {
-            var _this9 = this;
-
             // let cardSymbol;
             // if (evt) cardSymbol = evt.target.id;
             var cardSymbol = evt.target.id;
-            console.log('registering cardSymbol:', cardSymbol);
+            // console.log('registering cardSymbol:', cardSymbol);
             this.setState({
-                cardSymbol: cardSymbol
-            }, function () {
-                return console.log('cardSymbol after registering:', _this9.state.cardSymbol);
-            });
+                cardSymbol: cardSymbol /*, () => console.log('cardSymbol after registering:', this.state.cardSymbol)*/ });
         }
     }, {
         key: 'deregisterCardSymbol',
         value: function deregisterCardSymbol(evt) {
-            var _this10 = this;
-
-            var cardSymbol = evt.target.id;
-            console.log('de-registering cardSymbol:', cardSymbol);
+            // const cardSymbol = evt.target.id;
+            // console.log('de-registering cardSymbol:', cardSymbol);
             this.setState({
-                cardSymbol: null
-            }, function () {
-                return console.log('cardSymbol after de-registering:', _this10.state.cardSymbol);
-            });
+                cardSymbol: null /*, () => console.log('cardSymbol after de-registering:', this.state.cardSymbol)*/ });
         }
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this11 = this;
+            var _this8 = this;
 
             // console.log('componentDidMount');
             var socket = (0, _socket2.default)();
@@ -46333,17 +46319,17 @@ var App = function (_React$Component) {
 
             socket.on('stock symbols', function (symbols) {
                 // console.log('socket.on symbols:', symbols);
-                _this11.setState({ stockSymbols: symbols });
+                _this8.setState({ stockSymbols: symbols });
             });
             socket.on('stock names', function (names) {
                 // console.log('socket.on names:', names);
-                _this11.setState({ stockNames: names });
+                _this8.setState({ stockNames: names });
             });
             socket.on('stock data', function (stockData) {
 
-                var stockSymbols = _this11.state.stockSymbols;
-                _this11.setState({ stockData: stockData });
-                var build = _this11.buildChart(chartContainer);
+                var stockSymbols = _this8.state.stockSymbols;
+                _this8.setState({ stockData: stockData });
+                var build = _this8.buildChart(chartContainer);
                 // Using inner function's closure over the argument chartContainer
                 build(stockData, stockSymbols);
                 // console.log('setState @ compDidMnt:', this.state);
@@ -46364,9 +46350,9 @@ var App = function (_React$Component) {
                     localStorage.setItem('visited', 'true');
                     // console.log('stockData, stockSymbols:', stockData, stockSymbols);
                     this.getStockData().then(function (packaged) {
-                        var build = _this11.buildChart(chartContainer);
+                        var build = _this8.buildChart(chartContainer);
                         // console.log('does chartContainer exist inside the scope of a promise?:', chartContainer);
-                        _this11.unpackData(packaged, build);
+                        _this8.unpackData(packaged, build);
                     }).catch(function (err) {
                         return console.error(err);
                     });
@@ -46376,6 +46362,11 @@ var App = function (_React$Component) {
             window.onbeforeunload = function () {
                 localStorage.removeItem('visited');
             };
+            _highstock2.default.theme = (0, _theme.theme)();
+            _highstock2.default.setOptions(_highstock2.default.theme);
+
+            // const hasTen = stockSymbols.length > 9;
+            // this.setState({cardsFull: hasTen});
         }
     }, {
         key: 'render',
@@ -46398,6 +46389,7 @@ var App = function (_React$Component) {
             var stockInfo = stockSymbols.map(function (sym, i) {
                 return [sym, stockNames[i]];
             });
+            var cardsFull = this.state.cardsFull;
 
             return _react2.default.createElement(
                 'div',
@@ -46419,7 +46411,7 @@ var App = function (_React$Component) {
                                 }, id: sym, key: i },
                             _react2.default.createElement(
                                 _semanticUiReact.Transition,
-                                { animation: 'fade up', duration: 800, transitionOnMount: true },
+                                { animation: 'fade up', duration: 300, transitionOnMount: true },
                                 _react2.default.createElement(
                                     'div',
                                     { className: 'card-wrapper' },
@@ -46454,10 +46446,19 @@ var App = function (_React$Component) {
                         { className: 'search-wrapper' },
                         _react2.default.createElement('input', { onChange: handleInput, onKeyDown: handleKeyDown, type: 'text', placeholder: 'Enter a stock symbol..', value: value }),
                         _react2.default.createElement(
-                            _semanticUiReact.Button,
-                            { className: 'button', basic: true, color: 'grey', onClick: handleSubmit },
-                            'Add'
+                            'div',
+                            { className: 'button', onClick: handleSubmit },
+                            'ADD'
                         )
+                    )
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'cards-full-wrapper' },
+                    _react2.default.createElement(
+                        'p',
+                        null,
+                        cardsFull ? 'Maximum number of chartable stocks reached.' : ''
                     )
                 )
             );
@@ -70520,6 +70521,214 @@ Feed.User = __WEBPACK_IMPORTED_MODULE_16__FeedUser__["a" /* default */];
 
 /***/ }),
 /* 822 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.theme = theme;
+function theme() {
+    return {
+        colors: ['#2b908f', '#90ee7e', '#f45b5b', '#7798BF', '#aaeeee', '#ff0066', '#eeaaee', '#55BF3B', '#DF5353', '#7798BF', '#aaeeee'],
+        chart: {
+            backgroundColor: {
+                linearGradient: { x1: 0, y1: 0, x2: 1, y2: 1 },
+                stops: [[0, '#000'], [1, '#000']]
+            },
+            style: {
+                fontFamily: '\'Unica One\', sans-serif'
+            },
+            plotBorderColor: '#606063'
+        },
+        title: {
+            style: {
+                color: '#E0E0E3',
+                textTransform: 'uppercase',
+                fontSize: '20px'
+            }
+        },
+        subtitle: {
+            style: {
+                color: '#E0E0E3',
+                textTransform: 'uppercase'
+            }
+        },
+        xAxis: {
+            gridLineColor: '#707073',
+            labels: {
+                style: {
+                    color: '#E0E0E3'
+                }
+            },
+            lineColor: '#707073',
+            minorGridLineColor: '#505053',
+            tickColor: '#707073',
+            title: {
+                style: {
+                    color: '#A0A0A3'
+
+                }
+            }
+        },
+        yAxis: {
+            gridLineColor: '#707073',
+            labels: {
+                style: {
+                    color: '#E0E0E3'
+                }
+            },
+            lineColor: '#707073',
+            minorGridLineColor: '#505053',
+            tickColor: '#707073',
+            tickWidth: 1,
+            title: {
+                style: {
+                    color: '#A0A0A3'
+                }
+            }
+        },
+        tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
+            style: {
+                color: '#F0F0F0'
+            }
+        },
+        plotOptions: {
+            series: {
+                dataLabels: {
+                    color: '#B0B0B3'
+                },
+                marker: {
+                    lineColor: '#333'
+                }
+            },
+            boxplot: {
+                fillColor: '#505053'
+            },
+            candlestick: {
+                lineColor: 'white'
+            },
+            errorbar: {
+                color: 'white'
+            }
+        },
+        legend: {
+            itemStyle: {
+                color: '#E0E0E3'
+            },
+            itemHoverStyle: {
+                color: '#FFF'
+            },
+            itemHiddenStyle: {
+                color: '#606063'
+            }
+        },
+        credits: {
+            style: {
+                color: '#666'
+            }
+        },
+        labels: {
+            style: {
+                color: '#707073'
+            }
+        },
+
+        drilldown: {
+            activeAxisLabelStyle: {
+                color: '#F0F0F3'
+            },
+            activeDataLabelStyle: {
+                color: '#F0F0F3'
+            }
+        },
+
+        navigation: {
+            buttonOptions: {
+                symbolStroke: '#DDDDDD',
+                theme: {
+                    fill: '#505053'
+                }
+            }
+        },
+
+        // scroll charts
+        rangeSelector: {
+            buttonTheme: {
+                fill: '#505053',
+                stroke: '#000000',
+                style: {
+                    color: '#CCC'
+                },
+                states: {
+                    hover: {
+                        fill: '#707073',
+                        stroke: '#000000',
+                        style: {
+                            color: 'white'
+                        }
+                    },
+                    select: {
+                        fill: '#000003',
+                        stroke: '#000000',
+                        style: {
+                            color: 'white'
+                        }
+                    }
+                }
+            },
+            inputBoxBorderColor: '#505053',
+            inputStyle: {
+                backgroundColor: '#333',
+                color: 'silver'
+            },
+            labelStyle: {
+                color: 'silver'
+            }
+        },
+
+        navigator: {
+            handles: {
+                backgroundColor: '#666',
+                borderColor: '#AAA'
+            },
+            outlineColor: '#CCC',
+            maskFill: 'rgba(255,255,255,0.1)',
+            series: {
+                color: '#7798BF',
+                lineColor: '#A6C7ED'
+            },
+            xAxis: {
+                gridLineColor: '#505053'
+            }
+        },
+
+        scrollbar: {
+            barBackgroundColor: '#808083',
+            barBorderColor: '#808083',
+            buttonArrowColor: '#CCC',
+            buttonBackgroundColor: '#606063',
+            buttonBorderColor: '#606063',
+            rifleColor: '#FFF',
+            trackBackgroundColor: '#404043',
+            trackBorderColor: '#404043'
+        },
+
+        // special colors for some of the
+        legendBackgroundColor: 'rgba(0, 0, 0, 0.5)',
+        background2: '#505053',
+        dataLabelsColor: '#B0B0B3',
+        textColor: '#C0C0C0',
+        contrastTextColor: '#F0F0F3',
+        maskColor: 'rgba(255,255,255,0.3)'
+    };
+}
+
+/***/ }),
+/* 823 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
