@@ -1,19 +1,23 @@
 * {
-  box-sizing: border-box; }
+  box-sizing: border-box;
+  margin: 0;
+  border: 0; }
 
 html {
   background-color: black;
-  margin: 0; }
+  margin: 0;
+  height: 100%; }
   html body {
-    background-color: black; }
+    background-color: black;
+    height: 100%; }
   html .container-all .logo-wrapper {
     margin: .5em 0 0 1em; }
     html .container-all .logo-wrapper img {
       height: 55px; }
       html .container-all .logo-wrapper img:hover {
-        cursor: hand; }
+        cursor: pointer; }
     html .container-all .logo-wrapper:hover {
-      cursor: hand; }
+      cursor: pointer; }
   html .container-all .gloss {
     position: absolute;
     background: url("/img/stock.jpeg") no-repeat center;
@@ -29,11 +33,15 @@ html {
       html .container-all .gloss .view-chart-wrapper img {
         height: 80px; }
         html .container-all .gloss .view-chart-wrapper img:hover {
-          cursor: hand; }
+          cursor: pointer; }
       html .container-all .gloss .view-chart-wrapper .view-chart-text-wrapper {
-        color: white; }
+        color: white;
+        transition: all .3s ease; }
         html .container-all .gloss .view-chart-wrapper .view-chart-text-wrapper:hover {
-          cursor: hand; }
+          cursor: pointer;
+          color: #67f3fe; }
+      html .container-all .gloss .view-chart-wrapper .subtitle-wrapper {
+        color: white; }
     html .container-all .gloss .sidebar {
       background: rgba(0, 0, 0, 0.5);
       color: white; }
@@ -64,12 +72,21 @@ html {
               height: 50px; }
           html .container-all .gloss .sidebar .about-container .logos-container .react-logo-wrapper {
             padding: 0 1em 0 0em; }
+          html .container-all .gloss .sidebar .about-container .logos-container .semantic-ui-logo-wrapper img {
+            margin-right: .5em; }
           html .container-all .gloss .sidebar .about-container .logos-container .nodejs-logo-wrapper {
             padding: 0 .8em 0 0em; }
           html .container-all .gloss .sidebar .about-container .logos-container .mongodb-logo-wrapper {
             padding: 0 .9em 0 0em; }
+          html .container-all .gloss .sidebar .about-container .logos-container .socketio-logo-wrapper img {
+            margin-right: .5em; }
           html .container-all .gloss .sidebar .about-container .logos-container .logo-wrapper > * {
             vertical-align: top; }
+      html .container-all .gloss .sidebar .attribution a {
+        color: white;
+        transition: all .3s ease; }
+        html .container-all .gloss .sidebar .attribution a:hover {
+          color: #67f3fe; }
     html .container-all .gloss .arrow {
       position: absolute;
       display: inline-block;
@@ -79,11 +96,18 @@ html {
       transform: translateY(-16px);
       color: white;
       font-size: 4em;
-      font-weight: 900;
-      transition: all 0.3s ease; }
+      font-weight: 500;
+      transition: all 0.3s ease;
+      animation: 0.5s infinite alternate slidein; }
       html .container-all .gloss .arrow:hover {
-        color: teal;
+        color: #67f3fe;
         cursor: pointer; }
+
+@keyframes slidein {
+  from {
+    margin-left: 0; }
+  to {
+    margin-left: 0.15em; } }
   html .container-all .app-container {
     display: block;
     background-color: black; }
@@ -182,3 +206,24 @@ html {
           width: 60%;
           margin: auto;
           color: white; }
+  html .container-all .footer {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-100px);
+    bottom: .9em;
+    color: white; }
+    html .container-all .footer a {
+      color: white;
+      transition: all .3s ease;
+      display: inline-block;
+      line-height: 30px; }
+      html .container-all .footer a:hover {
+        color: #67f3fe; }
+    html .container-all .footer .github-wrapper {
+      vertical-align: bottom; }
+    html .container-all .footer .name-wrapper {
+      vertical-align: top; }
+    html .container-all .footer .seperator {
+      display: inline-block;
+      vertical-align: middle;
+      margin: 0 .2em 0 .2em; }

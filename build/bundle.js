@@ -45984,6 +45984,9 @@ var App = function (_React$Component) {
         return _this;
     }
 
+    // Get sotck metadata with Quandl API
+
+
     _createClass(App, [{
         key: 'getStockName',
         value: function getStockName(stockSymbol) {
@@ -46002,7 +46005,7 @@ var App = function (_React$Component) {
                 var paddedStockName = addPadding(stockName, 25);
                 console.log('paddedStockName, length', paddedStockName, paddedStockName.length);
                 state.stockNames.push(paddedStockName);
-                _this2.setState({ state: state /*, () => console.log('state after getting stockName:', this.state)*/ });
+                _this2.setState({ state: state });
                 return paddedStockName;
             }).catch(function (err) {
                 return console.error(err);
@@ -46019,6 +46022,9 @@ var App = function (_React$Component) {
                 return text + padding;
             }
         }
+
+        // Get stock time-series data with Quandl API
+
     }, {
         key: 'getData',
         value: function getData(stockSymbol) {
@@ -46027,16 +46033,13 @@ var App = function (_React$Component) {
             var api_key = '?api_key=mx7b4emwTWnteEaLCztY';
             var apiRoot = 'https://www.quandl.com/api/v3/datasets/WIKI/';
             var dataAPI = apiRoot + stockSymbol + '/data.json' + api_key;
-            // const metadataAPI = apiRoot + stockSymbol + '/metadata.json' + api_key;
             var state = _extends({}, this.state);
 
             return fetch(dataAPI).then(function (res) {
                 return res.json();
             }).then(function (resJson) {
-                // console.log('resJson:', resJson);
 
                 var stockData = state.stockData;
-                // let error = state.error;
 
                 if (resJson['quandl_error']) {
                     throw new Error(resJson['quandl_error'].message);
@@ -46044,8 +46047,8 @@ var App = function (_React$Component) {
                 var transformedData = transformData(resJson);
 
                 stockData.push(transformedData);
-                // error = false;
-                _this3.setState({ stockData: stockData, error: false /*, () => console.log('state after setState @ getData:', this.state)*/ });
+
+                _this3.setState({ stockData: stockData, error: false });
                 return transformedData;
             }).catch(function (err) {
                 console.error(err);
@@ -46060,26 +46063,32 @@ var App = function (_React$Component) {
                     var stockValue = d[4];
                     return [date, stockValue];
                 });
-                // console.log('transformedData:', data);
+
                 return data.reverse();
             }
         }
+        // Store user input in this.state
+
     }, {
         key: 'handleInput',
         value: function handleInput(evt) {
             var input = evt.target.value;
-            // console.log('input:', input);
+
             this.setState({
                 input: input
             });
         }
+        // Detect keyboard enter key
+
     }, {
         key: 'handleKeyDown',
         value: function handleKeyDown(evt) {
-            // console.log('evt.key', evt.key);
             var key = evt.key;
             if (key === 'Enter') this.handleSubmit();
         }
+        // If stock symbol isn't already displayed and API returns valid stock data
+        //emit stock data to server using socket.io
+
     }, {
         key: 'handleSubmit',
         value: function handleSubmit() {
@@ -46088,15 +46097,9 @@ var App = function (_React$Component) {
             var socket = (0, _socket2.default)();
             var state = _extends({}, this.state);
             var input = state.input;
-            // const stockNames = state.stockNames;
-            // console.log('stockNames @ handleSubmit:', stockNames);
-            // console.log('stockName @ handleSubmit:', stockName);
-            // const stockName = stockNames[stockNames.length];
             var symbol = input.trim().toUpperCase();
-            // console.log('trimmed input(symbol):', symbol);
             var stockSymbols = state.stockSymbols;
-            // let packaging;
-            // console.log('packaging:', packaging);
+
             function hasSymbol(sym) {
                 for (var i = 0; i < stockSymbols.length; i++) {
                     if (stockSymbols[i] === sym) return true;
@@ -46111,8 +46114,7 @@ var App = function (_React$Component) {
 
             if (!hasSymbol(symbol) && !hasTen) {
                 this.getData(symbol).then(function (stockDatum) {
-                    // console.log('result:', result);
-                    // console.log('!hasSymbol:', !hasSymbol(symbol));
+
                     if (stockDatum) {
                         var packaging = _this4.packageData(symbol, stockDatum);
                         stockSymbols.push(symbol);
@@ -46120,14 +46122,10 @@ var App = function (_React$Component) {
                         _this4.getStockName(symbol).then(function (name) {
                             var packaged = packaging(name);
                             _this4.setState({ state: state }, function () {
-                                // console.log('symbols to emit:', this.state.stockSymbols);
-                                // console.log('names to emit:', this.state.stockNames);
-                                // console.log('data to emit:', this.state.stockData);
                                 socket.emit('stock symbols', _this4.state.stockSymbols);
                                 socket.emit('stock names', _this4.state.stockNames);
                                 socket.emit('stock data', _this4.state.stockData);
                                 _this4.storeStockData(packaged);
-                                // console.log('state after setState:', this.state);
                             });
                         }).catch(function (err) {
                             return console.error(err);
@@ -46138,6 +46136,8 @@ var App = function (_React$Component) {
                 });
             }
         }
+        // Build stock chart with Highcharts
+
     }, {
         key: 'buildChart',
         value: function buildChart(where) {
@@ -46172,6 +46172,8 @@ var App = function (_React$Component) {
                 });
             };
         }
+        // Process stock time-series data, metadata and symbol before sending it to database
+
     }, {
         key: 'packageData',
         value: function packageData(symbol, stockDatum) {
@@ -46184,6 +46186,9 @@ var App = function (_React$Component) {
                 return pkg;
             };
         }
+        // Process packaged data into 3 seperate data: stock symbols, names, and time-series data
+        //so that the front-end code can use it to build stock chart
+
     }, {
         key: 'unpackData',
         value: function unpackData(data, fn) {
@@ -46207,15 +46212,14 @@ var App = function (_React$Component) {
                 }, function () {
                     // This fn already has chartContainer passed-in as an argument
                     if (fn) fn(stockData, stockSymbols);
-                    // console.log('state after unpacking:', this.state)
                 });
             }
         }
+        // Send packaged stock data to server to be stored in database
+
     }, {
         key: 'storeStockData',
         value: function storeStockData(packaged) {
-            // const stockSymbols = state.stockSymbols;
-            // const dataset = state.dataset;
 
             var apiUrl = 'http://localhost:8080/stock';
             var init = {
@@ -46225,29 +46229,28 @@ var App = function (_React$Component) {
                 },
                 body: JSON.stringify({
                     packaged: packaged
-                    // stockSymbol: symbol,
-                    // dataset: dataset
                 })
             };
             fetch(apiUrl, init).catch(function (err) {
                 console.error(err);
             });
         }
+        // Request to server to retrieve stock data in database
+
     }, {
         key: 'getStockData',
         value: function getStockData() {
-            // console.log('getStockData triggered');
             var apiUrl = 'http://localhost:8080/getstock';
             return fetch(apiUrl).then(function (res) {
                 return res.json();
-            })
-            // .then(resJson => this.setState({stockSymbols: resJson}))
-            .then(function (resJson) {
+            }).then(function (resJson) {
                 return resJson;
             }).catch(function (err) {
                 console.error(err);
             });
         }
+        // Remove a particular stock data from this.state and also request to remove it in database
+
     }, {
         key: 'removeStock',
         value: function removeStock(evt) {
@@ -46257,11 +46260,8 @@ var App = function (_React$Component) {
             var symbol = evt.target.id;
             var queryString = '?symbol=' + symbol.toLowerCase();
             var apiUrl = 'http://localhost:8080/remove';
-            // const testUrl = 'http://localhost:8080/remove/:symbol=fb';
-            // console.log('removeStock:', symbol);
-            fetch(apiUrl + queryString)
-            // fetch(testUrl)
-            .catch(function (err) {
+
+            fetch(apiUrl + queryString).catch(function (err) {
                 return console.error(err);
             });
 
@@ -46276,131 +46276,122 @@ var App = function (_React$Component) {
             stockNames.splice(stockSymbolIndex, 1);
 
             this.setState({ state: state }, function () {
-                // console.log('state after removeStock:', this.state);
+
                 socket.emit('stock symbols', _this5.state.stockSymbols);
                 socket.emit('stock names', _this5.state.stockNames);
                 socket.emit('stock data', _this5.state.stockData);
             });
             this.buildChart(document.querySelector('.chart-container'))();
         }
+        // Toggle remove(x)-icon
+
     }, {
         key: 'toggleIcon',
         value: function toggleIcon() {
-            // console.log('toggledIcon');
             this.setState({
-                icon: true /*, () => console.log('icon on?:', this.state.icon)*/ });
+                icon: true
+            });
         }
+        // Toggle remove(x)-icon off
+
     }, {
         key: 'toggleIconOff',
         value: function toggleIconOff() {
-            // console.log('toggledIcon OFF');
             this.setState({
-                icon: false /*, () => console.log('icon on?:', this.state.icon)*/ });
+                icon: false
+            });
         }
+        // Store stock symbol in state for indentifying which stock card is moused-over;
+        //this enables some user interface effects only on that stock card
+
     }, {
         key: 'registerCardSymbol',
         value: function registerCardSymbol(evt) {
-            // let cardSymbol;
-            // if (evt) cardSymbol = evt.target.id;
             var cardSymbol = evt.target.id;
-            // console.log('registering cardSymbol:', cardSymbol);
+
             this.setState({
-                cardSymbol: cardSymbol /*, () => console.log('cardSymbol after registering:', this.state.cardSymbol)*/ });
+                cardSymbol: cardSymbol
+            });
         }
+        // Opposite of the above
+
     }, {
         key: 'deregisterCardSymbol',
         value: function deregisterCardSymbol(evt) {
-            // const cardSymbol = evt.target.id;
-            // console.log('de-registering cardSymbol:', cardSymbol);
             this.setState({
-                cardSymbol: null /*, () => console.log('cardSymbol after de-registering:', this.state.cardSymbol)*/ });
+                cardSymbol: null
+            });
         }
+        // Toggle sidebar
+
     }, {
         key: 'toggleSidebar',
         value: function toggleSidebar() {
             this.setState({ sidebar: !this.state.sidebar });
         }
+        // Set browser history location in state also push to props.history so navigation is possible
+
     }, {
         key: 'setBrowserLocation',
         value: function setBrowserLocation(location) {
-            var _this6 = this;
-
-            console.log('setting browser location to:', location);
-            this.setState({ browserLocation: location }, function () {
-                return console.log('browserLocation after settingState:', _this6.state.browserLocation);
-            });
-            // this.setState(this.state);
+            this.setState({ browserLocation: location });
             this.props.history.push(location);
-            // this.buildChart(document.querySelector('.chartContainer'))(this.state.stockData, this.state.stcokSymbols);
         }
     }, {
         key: 'componentDidMount',
         value: function componentDidMount() {
-            var _this7 = this;
+            var _this6 = this;
 
-            console.log('componentDidMount');
-            console.log('history:', this.props.history);
             var socket = (0, _socket2.default)();
-            // console.log('socket:', socket);
             var chartContainer = document.querySelector('.chart-container');
-
+            // Listen for change
             socket.on('stock symbols', function (symbols) {
-                // console.log('socket.on symbols:', symbols);
-                _this7.setState({ stockSymbols: symbols });
+                _this6.setState({ stockSymbols: symbols });
             });
             socket.on('stock names', function (names) {
-                // console.log('socket.on names:', names);
-                _this7.setState({ stockNames: names });
+                _this6.setState({ stockNames: names });
             });
             socket.on('stock data', function (stockData) {
 
-                var stockSymbols = _this7.state.stockSymbols;
-                _this7.setState({ stockData: stockData });
-                var build = _this7.buildChart(chartContainer);
+                var stockSymbols = _this6.state.stockSymbols;
+                _this6.setState({ stockData: stockData });
+                var build = _this6.buildChart(chartContainer);
                 // Using inner function's closure over the argument chartContainer
                 build(stockData, stockSymbols);
-                // console.log('setState @ compDidMnt:', this.state);
             });
 
             var state = _extends({}, this.state);
-            // console.log('{...this.state} @ compDidMnt:', state);
             var stockSymbols = state.stockSymbols;
             var stockData = state.stockData;
 
             var pathname = this.props.history.location.pathname;
-            // if (pathname !== this.state.browserLocation) {
-            //     console.log('setting browser location in cmpDidMnt to:', pathname);
+
             this.setBrowserLocation(pathname);
-            // }
-            // const onHomepage = pathname === '/';
 
             // Code below ensures if user is reloading page or visiting the page for the first time,
             // previous searched stock info is retrieved and displayed
-            if (localStorage /* && !onHomepage*/) {
-                    // console.log('has localStorage');
-                    var visited = localStorage.getItem('visited');
-                    if (!visited) {
-                        // console.log('first time visit');
-                        localStorage.setItem('visited', 'true');
-                        // console.log('stockData, stockSymbols:', stockData, stockSymbols);
-                        this.getStockData().then(function (packaged) {
-                            var build = _this7.buildChart(chartContainer);
-                            // console.log('does chartContainer exist inside the scope of a promise?:', chartContainer);
-                            _this7.unpackData(packaged, build);
-                        }).catch(function (err) {
-                            return console.error(err);
-                        });
-                    }
+            if (localStorage) {
+
+                var visited = localStorage.getItem('visited');
+                if (!visited) {
+
+                    localStorage.setItem('visited', 'true');
+
+                    this.getStockData().then(function (packaged) {
+                        var build = _this6.buildChart(chartContainer);
+
+                        _this6.unpackData(packaged, build);
+                    }).catch(function (err) {
+                        return console.error(err);
+                    });
                 }
+            }
 
             window.onbeforeunload = function () {
                 localStorage.removeItem('visited');
             };
             _highstock2.default.theme = (0, _theme.theme)();
             _highstock2.default.setOptions(_highstock2.default.theme);
-
-            // const hasTen = stockSymbols.length > 9;
-            // this.setState({cardsFull: hasTen});
         }
     }, {
         key: 'render',
@@ -46429,6 +46420,7 @@ var App = function (_React$Component) {
             var visible = this.state.sidebar;
             var setBrowserLocation = this.setBrowserLocation;
             var browserLocation = this.state.browserLocation;
+            // Below 8 lines of code enables browsing between pages type of behavior
             var atChart = browserLocation === '/chart' ? 'block' : 'none';
             var atHome = browserLocation === '/' ? 'visible' : 'hidden';
             var appStyle = {
@@ -46522,6 +46514,25 @@ var App = function (_React$Component) {
                                 error ? 'Provided stock code didn\'t yield any results.' : ''
                             )
                         )
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer' },
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'name-wrapper', href: 'http://yungilhong.com' },
+                            'Yungil Hong'
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'seperator' },
+                            '|'
+                        ),
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'github-wrapper', href: 'https://github.com/hongyi0220/stock-chart' },
+                            'Project Github'
+                        )
                     )
                 ),
                 _react2.default.createElement(
@@ -46536,14 +46547,19 @@ var App = function (_React$Component) {
                     ),
                     _react2.default.createElement(
                         'div',
-                        { className: 'view-chart-wrapper' },
-                        _react2.default.createElement('img', { onClick: function onClick() {
+                        { onClick: function onClick() {
                                 setBrowserLocation('/chart');
-                            }, src: '/img/line-chart2.png' }),
+                            }, className: 'view-chart-wrapper' },
+                        _react2.default.createElement('img', { src: '/img/line-chart2.png' }),
                         _react2.default.createElement(
                             'div',
                             { className: 'view-chart-text-wrapper' },
                             'View Chart'
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'subtitle-wrapper' },
+                            'A stock chart powered by websockets'
                         )
                     ),
                     _react2.default.createElement(
@@ -46654,7 +46670,7 @@ var App = function (_React$Component) {
                                 { className: 'modules-logos-container logos-container' },
                                 _react2.default.createElement(
                                     'div',
-                                    { className: 'logo-wrapper' },
+                                    { className: 'socketio-logo-wrapper logo-wrapper' },
                                     _react2.default.createElement('img', { src: '/img/logos/socketio-logo.gif' }),
                                     _react2.default.createElement(
                                         'div',
@@ -46672,6 +46688,16 @@ var App = function (_React$Component) {
                                         'Highcharts'
                                     )
                                 )
+                            ),
+                            _react2.default.createElement(
+                                'div',
+                                { className: 'attribution' },
+                                'Logo made with ',
+                                _react2.default.createElement(
+                                    'a',
+                                    { href: 'https://\nwww.designevo.com/', title: 'Free Online Logo Maker' },
+                                    'DesignEvo'
+                                )
                             )
                         )
                     ),
@@ -46679,7 +46705,26 @@ var App = function (_React$Component) {
                         'div',
                         { className: 'arrow', onClick: toggleSidebar },
                         '>'
-                    ) : ''
+                    ) : '',
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'footer' },
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'name-wrapper', href: 'http://yungilhong.com' },
+                            'Yungil Hong'
+                        ),
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'seperator' },
+                            '|'
+                        ),
+                        _react2.default.createElement(
+                            'a',
+                            { className: 'github-wrapper', href: 'https://github.com/hongyi0220/stock-chart' },
+                            'Project Github'
+                        )
+                    )
                 )
             );
         }
