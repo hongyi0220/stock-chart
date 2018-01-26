@@ -1,12 +1,16 @@
 @import 'variables';
 * {
     box-sizing: border-box;
+    margin: 0;
+    border: 0;
 }
 html {
     background-color: black;
     margin: 0;
+    height: 100%;
     body {
         background-color: black;
+        height: 100%;
     }
     .container-all {
         .logo-wrapper {
@@ -14,11 +18,11 @@ html {
             img {
                 height: $logo-height;
                 &:hover {
-                    cursor: hand;
+                    cursor: pointer;
                 }
             }
             &:hover {
-                cursor: hand;
+                cursor: pointer;
             }
         }
         .gloss {
@@ -36,14 +40,19 @@ html {
                 img {
                     height: 80px;
                     &:hover {
-                        cursor: hand;
+                        cursor: pointer;
                     }
                 }
                 .view-chart-text-wrapper {
                     color: white;
+                    transition: all .3s ease;
                     &:hover {
-                        cursor: hand;
+                        cursor: pointer;
+                        color: $stock-teal;
                     }
+                }
+                .subtitle-wrapper {
+                    color: white;
                 }
             }
             .sidebar {
@@ -83,14 +92,34 @@ html {
                         .react-logo-wrapper {
                             padding: 0 1em 0 0em;
                         }
+                        .semantic-ui-logo-wrapper {
+                            // border: 1px solid red;
+                            img {
+                                margin-right: .5em;
+                            }
+                        }
                         .nodejs-logo-wrapper {
                             padding: 0 .8em 0 0em;
                         }
                         .mongodb-logo-wrapper {
                             padding: 0 .9em 0 0em;
                         }
+                        .socketio-logo-wrapper {
+                            img {
+                                margin-right: .5em;
+                            }
+                        }
                         .logo-wrapper > * {
                             vertical-align: top;
+                        }
+                    }
+                }
+                .attribution {
+                    a {
+                        color: white;
+                        transition: all .3s ease;
+                        &:hover {
+                            color: $stock-teal;
                         }
                     }
                 }
@@ -104,13 +133,23 @@ html {
                 transform: translateY(-16px);
                 color: white;
                 font-size: 4em;
-                font-weight: 900;
+                font-weight: 500;
                 transition: all 0.3s ease;
+                animation: 0.5s infinite alternate slidein;
                 &:hover {
-                    color: teal;
+                    color: $stock-teal;
                     cursor: pointer;
                 }
             }
+            @keyframes slidein {
+                from {
+                    margin-left: 0;
+                }
+                to {
+                    margin-left: 0.15em;
+                }
+            }
+
         }
         .app-container {
             display: block;
@@ -231,6 +270,33 @@ html {
                         color: white;
                     }
                 }
+            }
+        }
+        .footer {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-100px);
+            bottom: .9em;
+            color: white;
+            a {
+                color: white;
+                transition: all .3s ease;
+                display: inline-block;
+                line-height: 30px;
+                &:hover {
+                    color: $stock-teal;
+                }
+            }
+            .github-wrapper {
+                vertical-align: bottom;
+            }
+            .name-wrapper {
+                vertical-align: top;
+            }
+            .seperator {
+                display: inline-block;
+                vertical-align: middle;
+                margin: 0 .2em 0 .2em;
             }
         }
     }

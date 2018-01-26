@@ -463,13 +463,19 @@ class App extends React.Component {
                                 </div>
                             </div>
                         </div>
+                        <div className='footer'>
+                            <a className='name-wrapper' href='http://yungilhong.com'>Yungil Hong</a>
+                            <div className='seperator'>|</div>
+                            <a className='github-wrapper' href='https://github.com/hongyi0220/stock-chart'>Project Github</a>
+                        </div>
                     </div>
                     {/* This is 'homepage' */}
                     <div className='gloss' style={glossStyle}>
                         <div className='logo-wrapper'><img onClick={() => {setBrowserLocation('/')}} src='/img/logo2.png'/></div>
-                        <div  className='view-chart-wrapper'>
-                                <img onClick={()=> {setBrowserLocation('/chart')}} src='/img/line-chart2.png'/>
+                        <div onClick={()=> {setBrowserLocation('/chart')}} className='view-chart-wrapper'>
+                                <img src='/img/line-chart2.png'/>
                                 <div className='view-chart-text-wrapper'>View Chart</div>
+                                <div className='subtitle-wrapper'>A stock chart powered by websockets</div>
                         </div>
                         <Sidebar animation='overlay' visible={visible} width='very wide'>
                             <div className='about-container'>
@@ -509,7 +515,7 @@ class App extends React.Component {
                                 </div>
                                 <div className='tech-text-wrapper'>Key modules</div>
                                 <div className='modules-logos-container logos-container'>
-                                    <div className='logo-wrapper'>
+                                    <div className='socketio-logo-wrapper logo-wrapper'>
                                         <img src='/img/logos/socketio-logo.gif'/>
                                         <div className='logo-text-wrapper'>Socket.io</div>
                                     </div>
@@ -518,9 +524,16 @@ class App extends React.Component {
                                         <div className='logo-text-wrapper'>Highcharts</div>
                                     </div>
                                 </div>
+                                <div className='attribution'>Logo made with <a href="https://
+www.designevo.com/" title="Free Online Logo Maker">DesignEvo</a></div>
                             </div>
                         </Sidebar>
                         {!visible ? <div className='arrow' onClick={toggleSidebar}>></div> : ''}
+                        <div className='footer'>
+                            <a className='name-wrapper' href='http://yungilhong.com'>Yungil Hong</a>
+                            <div className='seperator'>|</div>
+                            <a className='github-wrapper' href='https://github.com/hongyi0220/stock-chart'>Project Github</a>
+                        </div>
                     </div>
             </div>
         );
