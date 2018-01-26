@@ -40,6 +40,7 @@ class App extends React.Component {
         this.setBrowserLocation = this.setBrowserLocation.bind(this);
     }
 
+    // Get sotck metadata with Quandl API
     getStockName(stockSymbol) {
         const api_key = '?api_key=mx7b4emwTWnteEaLCztY';
         const apiRoot = 'https://www.quandl.com/api/v3/datasets/WIKI/';
@@ -71,8 +72,8 @@ class App extends React.Component {
         }
     }
 
+    // Get stock time-series data with Quandl API
     getData(stockSymbol) {
-
         const api_key = '?api_key=mx7b4emwTWnteEaLCztY';
         const apiRoot = 'https://www.quandl.com/api/v3/datasets/WIKI/';
         const dataAPI = apiRoot + stockSymbol + '/data.json' + api_key;
@@ -111,7 +112,7 @@ class App extends React.Component {
             return data.reverse();
         }
     }
-
+    // Store user input in this.state
     handleInput(evt) {
         const input = evt.target.value;
 
@@ -119,13 +120,13 @@ class App extends React.Component {
             input: input
         });
     }
-
+    // Detect keyboard enter key
     handleKeyDown(evt) {
-
         const key = evt.key;
         if (key === 'Enter') this.handleSubmit();
     }
-
+    // If stock symbol isn't already displayed and API returns valid stock data
+    //emit stock data to server using socket.io
     handleSubmit() {
         const socket = socketIOClient();
         const state = {...this.state};
@@ -170,7 +171,7 @@ class App extends React.Component {
             .catch(err => console.log(err));
         }
     }
-
+    // Build stock chart with Highcharts
     buildChart(where) {
         const defaultData = this.state.stockData;
         const defaultSymbols = this.state.stockSymbols;
@@ -201,7 +202,7 @@ class App extends React.Component {
         }
 
     }
-
+    // Process stock time-series data, metadata and symbol before sending it to database
     packageData(symbol, stockDatum) {
         return function packaging(stockName) {
                     const pkg = {
@@ -212,7 +213,8 @@ class App extends React.Component {
                     return pkg;
                 }
     }
-
+    // Process packaged data into 3 seperate data: stock symbols, names, and time-series data
+    //so that the front-end code can use it to build stock chart
     unpackData(data, fn) {
         let stockSymbols = [];
         let stockData = [];
@@ -238,7 +240,7 @@ class App extends React.Component {
         }
 
     }
-
+    // Send packaged stock data to server to be stored in database
     storeStockData(packaged) {
 
         const apiUrl = 'http://localhost:8080/stock';
@@ -256,7 +258,7 @@ class App extends React.Component {
             console.error(err);
         });
     }
-
+    // Request to server to retrieve stock data in database
     getStockData() {
         const apiUrl = 'http://localhost:8080/getstock';
         return fetch(apiUrl)
@@ -266,7 +268,7 @@ class App extends React.Component {
             console.error(err);
         });
     }
-
+    // Remove a particular stock data from this.state and also request to remove it in database
     removeStock(evt) {
         const socket = socketIOClient();
         const symbol = evt.target.id;
@@ -295,19 +297,20 @@ class App extends React.Component {
         });
         this.buildChart(document.querySelector('.chart-container'))();
     }
-
+    // Toggle remove(x)-icon
     toggleIcon() {
         this.setState({
             icon: true
         });
     }
-
+    // Toggle remove(x)-icon off
     toggleIconOff() {
         this.setState({
             icon: false
         });
     }
-
+    // Store stock symbol in state for indentifying which stock card is moused-over;
+    //this enables some user interface effects only on that stock card
     registerCardSymbol(evt) {
         const cardSymbol = evt.target.id;
 
@@ -315,17 +318,17 @@ class App extends React.Component {
             cardSymbol: cardSymbol
         });
     }
-
+    // Opposite of the above
     deregisterCardSymbol(evt) {
         this.setState({
             cardSymbol: null
         });
     }
-
+    // Toggle sidebar
     toggleSidebar() {
         this.setState({sidebar: !this.state.sidebar});
     }
-
+    // Set browser history location in state also push to props.history so navigation is possible
     setBrowserLocation(location) {
         this.setState({browserLocation: location});
         this.props.history.push(location);
@@ -334,7 +337,7 @@ class App extends React.Component {
     componentDidMount() {
         const socket = socketIOClient();
         const chartContainer = document.querySelector('.chart-container');
-
+        // Listen for change
         socket.on('stock symbols', symbols => {
             this.setState({stockSymbols: symbols})
         });
@@ -407,6 +410,7 @@ class App extends React.Component {
         const visible = this.state.sidebar;
         const setBrowserLocation = this.setBrowserLocation;
         const browserLocation = this.state.browserLocation;
+        // Below 8 lines of code enables browsing between pages type of behavior
         const atChart = browserLocation === '/chart' ? 'block' : 'none';
         const atHome = browserLocation === '/' ? 'visible' : 'hidden';
         const appStyle = {
@@ -421,6 +425,7 @@ class App extends React.Component {
                 <div className='logo-wrapper'>
                     <img onClick={() => {setBrowserLocation('/')}} src='/img/logo2.png'/>
                 </div>
+                {/* This is stock chart 'page' */}
                 <div className='app-container' style={appStyle}>
 
                         <div className='chart-container'></div>
@@ -459,7 +464,7 @@ class App extends React.Component {
                             </div>
                         </div>
                     </div>
-
+                    {/* This is 'homepage' */}
                     <div className='gloss' style={glossStyle}>
                         <div className='logo-wrapper'><img onClick={() => {setBrowserLocation('/')}} src='/img/logo2.png'/></div>
                         <div  className='view-chart-wrapper'>

@@ -13,7 +13,7 @@ app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(bodyParser.json({ limit: '50mb' }));
 
 app.use(express.static('build'));
-
+// Remove a stock data from DB
 app.get('/remove', (req, res) => {
     const query = req.query;
     const symbol = query.symbol.toUpperCase();
@@ -26,7 +26,7 @@ app.get('/remove', (req, res) => {
         res.end();
     });
 });
-
+// Retrieve stock data from DB
 app.get('/getstock', (req, res) => {
     MongoClient.connect(dbUrl, (err, db) => {
         if (err) console.error(err);
@@ -38,7 +38,7 @@ app.get('/getstock', (req, res) => {
         });
     });
 });
-
+// Store stock data
 app.post('/stock', (req, res) => {
     MongoClient.connect(dbUrl, (err, db) => {
         if (err) console.error(err);
@@ -53,7 +53,7 @@ app.post('/stock', (req, res) => {
 app.get('*', (req, res) => {
     res.sendFile(__dirname + '/build/index.html')
 });
-
+// Listen for change on the front-end, then emit to all users connected
 io.on('connection', function(socket) {
     console.log('a user connected');
     socket.on('stock symbols', function(symbols) {
