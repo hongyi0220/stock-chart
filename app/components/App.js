@@ -243,8 +243,8 @@ class App extends React.Component {
     }
     // Send packaged stock data to server to be stored in database
     storeStockData(packaged) {
-
-        const apiUrl = 'http://localhost:8080/stock';
+        const dev = this.state.dev;
+        const apiUrl = dev ? 'http://localhost:8080/stock': 'https://stock-chart-0220.herokuapp.com/stock';
         const init = {
             method: 'POST',
             headers: {
@@ -261,7 +261,8 @@ class App extends React.Component {
     }
     // Request to server to retrieve stock data in database
     getStockData() {
-        const apiUrl = 'http://localhost:8080/getstock';
+        const dev = this.state.dev;
+        const apiUrl = dev ? 'http://localhost:8080/getstock' : 'https://stock-chart-0220.herokuapp.com/getstock';
         return fetch(apiUrl)
         .then(res => res.json())
         .then(resJson => {return resJson})
@@ -274,7 +275,8 @@ class App extends React.Component {
         const socket = socketIOClient();
         const symbol = evt.target.id;
         const queryString = '?symbol=' + symbol.toLowerCase();
-        const apiUrl = 'http://localhost:8080/remove';
+        const dev = this.state.dev;
+        const apiUrl = dev ? 'http://localhost:8080/remove' : 'https://stock-chart-0220.herokuapp.com/remove';
 
         fetch(apiUrl + queryString)
         .catch(err => console.error(err));
