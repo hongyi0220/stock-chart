@@ -1,7 +1,10 @@
 {
   "name": "stock-chart",
   "version": "1.0.0",
-  "description": "",
+  "engines": {
+   "node": "8.9.1"
+ },
+  "description": "A stock chart powered by websockets.",
   "main": "server.js",
   "scripts": {
     "build": "webpack",

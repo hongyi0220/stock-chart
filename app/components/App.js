@@ -21,7 +21,8 @@ class App extends React.Component {
             cardsFull: false,
             error: null,
             sidebar: false,
-            browserLocation: '/'
+            browserLocation: '/',
+            dev: false
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInput = this.handleInput.bind(this);
