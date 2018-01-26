@@ -159,7 +159,7 @@ html {
               cursor: pointer; }
     html .container-all .app-container .search-container {
       width: 100%;
-      margin: 2em 0 1em 0; }
+      margin: 2em 0 1.5em 0; }
       html .container-all .app-container .search-container .search-wrapper {
         height: 40px;
         margin: auto;

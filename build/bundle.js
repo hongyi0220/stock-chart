@@ -45964,7 +45964,8 @@ var App = function (_React$Component) {
             cardsFull: false,
             error: null,
             sidebar: false,
-            browserLocation: '/'
+            browserLocation: '/',
+            dev: false
         };
         _this.handleSubmit = _this.handleSubmit.bind(_this);
         _this.handleInput = _this.handleInput.bind(_this);
@@ -46220,8 +46221,8 @@ var App = function (_React$Component) {
     }, {
         key: 'storeStockData',
         value: function storeStockData(packaged) {
-
-            var apiUrl = 'http://localhost:8080/stock';
+            var dev = this.state.dev;
+            var apiUrl = dev ? 'http://localhost:8080/stock' : 'https://stock-chart-0220.herokuapp.com/stock';
             var init = {
                 method: 'POST',
                 headers: {
@@ -46240,7 +46241,8 @@ var App = function (_React$Component) {
     }, {
         key: 'getStockData',
         value: function getStockData() {
-            var apiUrl = 'http://localhost:8080/getstock';
+            var dev = this.state.dev;
+            var apiUrl = dev ? 'http://localhost:8080/getstock' : 'https://stock-chart-0220.herokuapp.com/getstock';
             return fetch(apiUrl).then(function (res) {
                 return res.json();
             }).then(function (resJson) {
@@ -46259,7 +46261,8 @@ var App = function (_React$Component) {
             var socket = (0, _socket2.default)();
             var symbol = evt.target.id;
             var queryString = '?symbol=' + symbol.toLowerCase();
-            var apiUrl = 'http://localhost:8080/remove';
+            var dev = this.state.dev;
+            var apiUrl = dev ? 'http://localhost:8080/remove' : 'https://stock-chart-0220.herokuapp.com/remove';
 
             fetch(apiUrl + queryString).catch(function (err) {
                 return console.error(err);
