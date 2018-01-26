@@ -6,10 +6,14 @@ html {
   margin: 0; }
   html body {
     background-color: black; }
-  html .container-all .logo-wrapper img {
-    height: 100px; }
-  html .container-all .logo-wrapper:hover {
-    cursor: hand; }
+  html .container-all .logo-wrapper {
+    margin: .5em 0 0 1em; }
+    html .container-all .logo-wrapper img {
+      height: 55px; }
+      html .container-all .logo-wrapper img:hover {
+        cursor: hand; }
+    html .container-all .logo-wrapper:hover {
+      cursor: hand; }
   html .container-all .gloss {
     position: absolute;
     background: url("/img/stock.jpeg") no-repeat center;
@@ -21,7 +25,7 @@ html {
       position: relative;
       text-align: center;
       top: 50%;
-      transform: translateY(-155px); }
+      transform: translateY(-111px); }
       html .container-all .gloss .view-chart-wrapper img {
         height: 80px; }
         html .container-all .gloss .view-chart-wrapper img:hover {
@@ -74,20 +78,22 @@ html {
       height: 32px;
       transform: translateY(-16px);
       color: white;
-      font-size: 4em; }
+      font-size: 4em;
+      font-weight: 900;
+      transition: all 0.3s ease; }
       html .container-all .gloss .arrow:hover {
         color: teal;
         cursor: pointer; }
   html .container-all .app-container {
+    display: block;
     background-color: black; }
     html .container-all .app-container .chart-container {
       margin: auto;
-      margin-top: 3em;
       width: 80%;
       height: 400px; }
     html .container-all .app-container .cards-container {
       margin: auto;
-      margin-top: 2em;
+      margin-top: 1.5em;
       width: 80%; }
       html .container-all .app-container .cards-container .transition-wrapper {
         display: inline-block;
@@ -106,7 +112,7 @@ html {
           transform: translateY(-40px); }
           html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .stock-card {
             text-align: center;
-            border-left: 3px solid #00f72c;
+            border-left: 5px solid #67f3fe;
             border-top-left-radius: 1px;
             border-bottom-left-radius: 1px;
             width: 140px;
@@ -114,7 +120,7 @@ html {
             transition: all 0.3s ease;
             color: white; }
             html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .stock-card:hover {
-              border-left: 5px solid red;
+              border-left: 7px solid red;
               border-top-left-radius: 1px;
               border-bottom-left-radius: 2px; }
             html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .stock-card .stock-symbol-wrapper {
@@ -129,7 +135,7 @@ html {
               cursor: pointer; }
     html .container-all .app-container .search-container {
       width: 100%;
-      margin: 2em 0 2em 0; }
+      margin: 2em 0 1em 0; }
       html .container-all .app-container .search-container .search-wrapper {
         height: 40px;
         margin: auto;

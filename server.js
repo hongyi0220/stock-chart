@@ -15,10 +15,9 @@ app.use(bodyParser.json({ limit: '50mb' }));
 app.use(express.static('build'));
 
 app.get('/remove', (req, res) => {
-
     const query = req.query;
     const symbol = query.symbol.toUpperCase();
-    console.log('query:', query);
+
     MongoClient.connect(dbUrl, (err, db) => {
         if (err) console.error(err);
         db.collection('stockdata')
@@ -34,7 +33,6 @@ app.get('/getstock', (req, res) => {
         db.collection('stockdata').find({})
         .toArray((err, data) => {
             if (err) console.error(err);
-            // console.log('data @ "/getstock":', data);
             res.send(data);
             db.close();
         });
@@ -49,31 +47,6 @@ app.post('/stock', (req, res) => {
         .insert(packaged);
         db.close();
         res.end();
-        //     res.end();
-        // collection.find({})
-        // .toArray((err, data) => {
-        //     if (err) console.error(err);
-        //
-        //     // const symbol = req.body.stockSymbol;
-        //     // const stockSymbols = req.body.stockSymbols;
-        //     // const schema = {
-        //     //     stockSymbols: [symbol]
-        //     // }
-        //     const package = req.body.package;
-        //     console.log('stockSymbols @ server:', symbol);
-        //     if (data.length) {
-        //         console.log('data exists, updating..');
-        //         collection.updateOne(
-        //             {},// Update first doc found
-        //             {$push: {stockSymbols: symbol}}
-        //         );
-        //     } else {
-        //         console.log('data doesn\'t exist, inserting..');
-        //         collection.insert(schema);
-        //     }
-        //     db.close();
-        //     res.end();
-        // });
     });
 });
 
@@ -84,15 +57,12 @@ app.get('*', (req, res) => {
 io.on('connection', function(socket) {
     console.log('a user connected');
     socket.on('stock symbols', function(symbols) {
-        // console.log('symbols recieved @ server:', symbols);
         socket.broadcast.emit('stock symbols', symbols);
     });
     socket.on('stock names', function(names) {
-        // console.log('dataset recieved @ server:', dataset);
         socket.broadcast.emit('stock names', names);
     });
     socket.on('stock data', function(stockData) {
-        // console.log('dataset recieved @ server:', dataset);
         socket.broadcast.emit('stock data', stockData);
     });
     socket.on('disconnect', function() {
@@ -100,6 +70,4 @@ io.on('connection', function(socket) {
     });
 });
 
-http.listen(port, function() {
-    console.log('listening on: 8080');
-});
+http.listen(port);

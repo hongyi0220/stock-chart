@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter, Route, Switch, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import socketIOClient from 'socket.io-client';
 import Highcharts from 'highcharts/highstock';
 import { Transition, Icon, Sidebar } from 'semantic-ui-react';
@@ -20,7 +20,8 @@ class App extends React.Component {
             cardSymbol: null,
             cardsFull: false,
             error: null,
-            sidebar: false
+            sidebar: false,
+            browserLocation: '/'
         }
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleInput = this.handleInput.bind(this);
@@ -36,6 +37,7 @@ class App extends React.Component {
         this.deregisterCardSymbol = this.deregisterCardSymbol.bind(this);
         this.getStockName = this.getStockName.bind(this);
         this.toggleSidebar = this.toggleSidebar.bind(this);
+        this.setBrowserLocation = this.setBrowserLocation.bind(this);
     }
 
     getStockName(stockSymbol) {
@@ -52,7 +54,7 @@ class App extends React.Component {
             const paddedStockName = addPadding(stockName, 25);
             console.log('paddedStockName, length', paddedStockName, paddedStockName.length);
             state.stockNames.push(paddedStockName);
-            this.setState({ state }/*, () => console.log('state after getting stockName:', this.state)*/);
+            this.setState({ state });
             return paddedStockName;
         })
         .catch(err => console.error(err));
@@ -74,16 +76,13 @@ class App extends React.Component {
         const api_key = '?api_key=mx7b4emwTWnteEaLCztY';
         const apiRoot = 'https://www.quandl.com/api/v3/datasets/WIKI/';
         const dataAPI = apiRoot + stockSymbol + '/data.json' + api_key;
-        // const metadataAPI = apiRoot + stockSymbol + '/metadata.json' + api_key;
         const state = {...this.state};
 
         return fetch(dataAPI)
         .then(res => res.json())
         .then(resJson => {
-            // console.log('resJson:', resJson);
 
             let stockData = state.stockData;
-            // let error = state.error;
 
             if (resJson['quandl_error']) {
                 throw new Error(resJson['quandl_error'].message);
@@ -91,8 +90,8 @@ class App extends React.Component {
             const transformedData = transformData(resJson);
 
             stockData.push(transformedData);
-            // error = false;
-            this.setState({stockData: stockData, error: false}/*, () => console.log('state after setState @ getData:', this.state)*/);
+
+            this.setState({stockData: stockData, error: false});
             return transformedData;
         })
         .catch(err => {
@@ -108,21 +107,21 @@ class App extends React.Component {
                 const stockValue = d[4];
                 return [date, stockValue];
             });
-            // console.log('transformedData:', data);
+
             return data.reverse();
         }
     }
 
     handleInput(evt) {
         const input = evt.target.value;
-        // console.log('input:', input);
+
         this.setState({
             input: input
         });
     }
 
     handleKeyDown(evt) {
-        // console.log('evt.key', evt.key);
+
         const key = evt.key;
         if (key === 'Enter') this.handleSubmit();
     }
@@ -131,15 +130,9 @@ class App extends React.Component {
         const socket = socketIOClient();
         const state = {...this.state};
         const input = state.input;
-        // const stockNames = state.stockNames;
-        // console.log('stockNames @ handleSubmit:', stockNames);
-        // console.log('stockName @ handleSubmit:', stockName);
-        // const stockName = stockNames[stockNames.length];
         const symbol = input.trim().toUpperCase();
-        // console.log('trimmed input(symbol):', symbol);
         const stockSymbols = state.stockSymbols;
-        // let packaging;
-        // console.log('packaging:', packaging);
+
         function hasSymbol(sym) {
             for (let i = 0; i < stockSymbols.length; i++) {
                 if (stockSymbols[i] === sym) return true;
@@ -155,8 +148,7 @@ class App extends React.Component {
         if (!hasSymbol(symbol) && !hasTen) {
             this.getData(symbol)
             .then(stockDatum => {
-                // console.log('result:', result);
-                // console.log('!hasSymbol:', !hasSymbol(symbol));
+
                 if (stockDatum) {
                     var packaging = this.packageData(symbol, stockDatum);
                     stockSymbols.push(symbol);
@@ -165,14 +157,11 @@ class App extends React.Component {
                     .then(name => {
                         const packaged = packaging(name);
                         this.setState({ state }, () => {
-                            // console.log('symbols to emit:', this.state.stockSymbols);
-                            // console.log('names to emit:', this.state.stockNames);
-                            // console.log('data to emit:', this.state.stockData);
                             socket.emit('stock symbols', this.state.stockSymbols);
                             socket.emit('stock names', this.state.stockNames);
                             socket.emit('stock data', this.state.stockData);
                             this.storeStockData(packaged);
-                            // console.log('state after setState:', this.state);
+
                         });
                     })
                     .catch(err => console.error(err));
@@ -245,15 +234,12 @@ class App extends React.Component {
             }, () => {
                 // This fn already has chartContainer passed-in as an argument
                 if (fn) fn(stockData, stockSymbols);
-                // console.log('state after unpacking:', this.state)
             });
         }
 
     }
 
     storeStockData(packaged) {
-        // const stockSymbols = state.stockSymbols;
-        // const dataset = state.dataset;
 
         const apiUrl = 'http://localhost:8080/stock';
         const init = {
@@ -263,10 +249,8 @@ class App extends React.Component {
             },
             body: JSON.stringify({
                 packaged: packaged
-                // stockSymbol: symbol,
-                // dataset: dataset
             })
-        }
+        };
         fetch(apiUrl, init)
         .catch(err => {
             console.error(err);
@@ -274,11 +258,9 @@ class App extends React.Component {
     }
 
     getStockData() {
-        // console.log('getStockData triggered');
         const apiUrl = 'http://localhost:8080/getstock';
         return fetch(apiUrl)
         .then(res => res.json())
-        // .then(resJson => this.setState({stockSymbols: resJson}))
         .then(resJson => {return resJson})
         .catch(err => {
             console.error(err);
@@ -290,10 +272,8 @@ class App extends React.Component {
         const symbol = evt.target.id;
         const queryString = '?symbol=' + symbol.toLowerCase();
         const apiUrl = 'http://localhost:8080/remove';
-        // const testUrl = 'http://localhost:8080/remove/:symbol=fb';
-        // console.log('removeStock:', symbol);
+
         fetch(apiUrl + queryString)
-        // fetch(testUrl)
         .catch(err => console.error(err));
 
         const state = {...this.state};
@@ -307,7 +287,7 @@ class App extends React.Component {
         stockNames.splice(stockSymbolIndex, 1);
 
         this.setState({ state }, () => {
-            // console.log('state after removeStock:', this.state);
+
             socket.emit('stock symbols', this.state.stockSymbols);
             socket.emit('stock names', this.state.stockNames);
             socket.emit('stock data', this.state.stockData);
@@ -317,54 +297,48 @@ class App extends React.Component {
     }
 
     toggleIcon() {
-        // console.log('toggledIcon');
         this.setState({
             icon: true
-        }/*, () => console.log('icon on?:', this.state.icon)*/);
+        });
     }
 
     toggleIconOff() {
-        // console.log('toggledIcon OFF');
         this.setState({
             icon: false
-        }/*, () => console.log('icon on?:', this.state.icon)*/);
+        });
     }
 
     registerCardSymbol(evt) {
-        // let cardSymbol;
-        // if (evt) cardSymbol = evt.target.id;
         const cardSymbol = evt.target.id;
-        // console.log('registering cardSymbol:', cardSymbol);
+
         this.setState({
             cardSymbol: cardSymbol
-        }/*, () => console.log('cardSymbol after registering:', this.state.cardSymbol)*/);
+        });
     }
 
     deregisterCardSymbol(evt) {
-        // const cardSymbol = evt.target.id;
-        // console.log('de-registering cardSymbol:', cardSymbol);
         this.setState({
             cardSymbol: null
-        }/*, () => console.log('cardSymbol after de-registering:', this.state.cardSymbol)*/);
+        });
     }
 
     toggleSidebar() {
         this.setState({sidebar: !this.state.sidebar});
     }
 
+    setBrowserLocation(location) {
+        this.setState({browserLocation: location});
+        this.props.history.push(location);
+    }
+
     componentDidMount() {
-        console.log('componentDidMount');
-        console.log('history:', this.props.history);
         const socket = socketIOClient();
-        // console.log('socket:', socket);
         const chartContainer = document.querySelector('.chart-container');
 
         socket.on('stock symbols', symbols => {
-            // console.log('socket.on symbols:', symbols);
             this.setState({stockSymbols: symbols})
         });
         socket.on('stock names', names => {
-            // console.log('socket.on names:', names);
             this.setState({stockNames: names})
         });
         socket.on('stock data', stockData => {
@@ -374,34 +348,32 @@ class App extends React.Component {
             const build = this.buildChart(chartContainer);
             // Using inner function's closure over the argument chartContainer
             build(stockData, stockSymbols);
-            // console.log('setState @ compDidMnt:', this.state);
         });
 
         const state = {...this.state};
-        // console.log('{...this.state} @ compDidMnt:', state);
         const stockSymbols = state.stockSymbols;
         const stockData = state.stockData;
 
         const pathname = this.props.history.location.pathname;
-        const onHomepage = pathname === '/';
+
+        this.setBrowserLocation(pathname);
 
         // Code below ensures if user is reloading page or visiting the page for the first time,
         // previous searched stock info is retrieved and displayed
-        if (localStorage && !onHomepage) {
-            // console.log('has localStorage');
+        if (localStorage) {
+
             const visited = localStorage.getItem('visited');
             if (!visited) {
-                // console.log('first time visit');
+
                 localStorage.setItem('visited', 'true');
-                // console.log('stockData, stockSymbols:', stockData, stockSymbols);
+
                 this.getStockData()
                 .then(packaged => {
                     const build = this.buildChart(chartContainer);
-                    // console.log('does chartContainer exist inside the scope of a promise?:', chartContainer);
+
                     this.unpackData(packaged, build);
                 })
                 .catch(err => console.error(err));
-
             }
         }
 
@@ -410,9 +382,6 @@ class App extends React.Component {
         }
         Highcharts.theme = theme();
         Highcharts.setOptions(Highcharts.theme);
-
-        // const hasTen = stockSymbols.length > 9;
-        // this.setState({cardsFull: hasTen});
     }
 
     render() {
@@ -436,120 +405,119 @@ class App extends React.Component {
         const error = this.state.error;
         const toggleSidebar = this.toggleSidebar;
         const visible = this.state.sidebar;
+        const setBrowserLocation = this.setBrowserLocation;
+        const browserLocation = this.state.browserLocation;
+        const atChart = browserLocation === '/chart' ? 'block' : 'none';
+        const atHome = browserLocation === '/' ? 'visible' : 'hidden';
+        const appStyle = {
+            display: atChart
+        };
+        const glossStyle = {
+            visibility: atHome
+        };
 
         return (
             <div onClick={() => {if (visible) toggleSidebar()}} className='container-all'>
-                <Switch>
-                    <Route path='/chart'>
-                        <div className='app-container'>
-                            <div className='logo-wrapper'><Link to='/'><img src='/img/logo2.png'/></Link></div>
-                            <div className='chart-container'></div>
-                            <div className='cards-container'>
-                                {stockInfo.map((si, i) => {
-                                    const sym = si[0];
-                                    const name = si[1];
-                                    return (<div className='transition-wrapper' onMouseEnter={(evt) => {registerCardSymbol(evt); toggleIcon()}}
-                                        onMouseLeave={(evt) => {deregisterCardSymbol(evt); toggleIconOff()}} id={sym} key={i} >
-                                        <Transition animation='fade up' duration={300} transitionOnMount={true}>
-                                            <div className='card-wrapper'>
-                                                <div className='stock-card' id={sym} >
-                                                    <div className='stock-symbol-wrapper'>{sym}</div>
-                                                    <div className='stock-name-wrapper'>{name}</div>
-                                                    {icon && (cardSymbol === sym) ? <Icon onClick={(evt) => {removeStock(evt); /*registerCardSymbol(evt); toggleIcon()*/}}
-                                                        id={sym} className='icon' color='grey' name='delete'></Icon> : ''}
-                                                </div>
+                <div className='logo-wrapper'>
+                    <img onClick={() => {setBrowserLocation('/')}} src='/img/logo2.png'/>
+                </div>
+                <div className='app-container' style={appStyle}>
+
+                        <div className='chart-container'></div>
+                        <div className='cards-container'>
+                            {stockInfo.map((si, i) => {
+                                const sym = si[0];
+                                const name = si[1];
+                                return (<div className='transition-wrapper' onMouseEnter={(evt) => {registerCardSymbol(evt); toggleIcon()}}
+                                    onMouseLeave={(evt) => {deregisterCardSymbol(evt); toggleIconOff()}} id={sym} key={i} >
+                                    <Transition animation='fade up' duration={300} transitionOnMount={true}>
+                                        <div className='card-wrapper'>
+                                            <div className='stock-card' id={sym} >
+                                                <div className='stock-symbol-wrapper'>{sym}</div>
+                                                <div className='stock-name-wrapper'>{name}</div>
+                                                {icon && (cardSymbol === sym) ? <Icon onClick={removeStock} id={sym}
+                                                    className='icon' color='grey' name='delete'></Icon> : ''}
                                             </div>
-                                        </Transition>
-                                    </div>)
-                                })}
-                            </div>
-
-                            <div className='search-container'>
-                                <div className='search-wrapper'>
-                                    <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
-                                    <div className='button' onClick={handleSubmit}>ADD</div>
-                                </div>
-                                <div className='cards-full-container'>
-                                    <div className='cards-full-msg-wrapper'>{cardsFull ? 'Maximum number of chartable stocks reached.' : ''}</div>
-                                    <div className='error-msg-wrapper'>{error ? 'Provided stock code didn\'t yield any results.' : ''}</div>
-                                </div>
-                            </div>
-
+                                        </div>
+                                    </Transition>
+                                </div>)
+                            })}
                         </div>
-                    </Route>
-                    <Route path='/'>
-                        <div className='gloss'>
-                            <div className='logo-wrapper'><Link to='/'><img src='/img/logo2.png'/></Link></div>
-                            <div className='view-chart-wrapper'>
-                                <Link to='/chart'>
-                                    <img src='/img/line-chart2.png'/>
-                                    <div className='view-chart-text-wrapper'>View Chart</div>
-                                </Link>
+
+                        <div className='search-container'>
+                            <div className='search-wrapper'>
+                                <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
+                                <div className='button' onClick={handleSubmit}>ADD</div>
                             </div>
-                            <Sidebar animation='overlay' visible={visible} width='very wide'>
-                                <div className='about-container'>
-                                    <div className='about-text-wrapper'>About This App</div>
-                                    <div className='tech-text-wrapper'>Front-end tech stack</div>
-                                    <div className='front-end-logos-container logos-container'>
-                                        <div className='react-logo-wrapper logo-wrapper'><img src='/img/logos/react-logo.png'/><div className='logo-text-wrapper'>React</div></div>
-                                        <div className='semantic-ui-logo-wrapper logo-wrapper'><img src='/img/logos/semantic-ui-logo.png'/><div className='logo-text-wrapper'>Semantic-UI-React</div></div>
+                            <div className='cards-full-container'>
+                                <div className='cards-full-msg-wrapper'>
+                                    {cardsFull ? 'Maximum number of chartable stocks reached.' : ''}
+                                </div>
+                                <div className='error-msg-wrapper'>
+                                    {error ? 'Provided stock code didn\'t yield any results.' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className='gloss' style={glossStyle}>
+                        <div className='logo-wrapper'><img onClick={() => {setBrowserLocation('/')}} src='/img/logo2.png'/></div>
+                        <div  className='view-chart-wrapper'>
+                                <img onClick={()=> {setBrowserLocation('/chart')}} src='/img/line-chart2.png'/>
+                                <div className='view-chart-text-wrapper'>View Chart</div>
+                        </div>
+                        <Sidebar animation='overlay' visible={visible} width='very wide'>
+                            <div className='about-container'>
+                                <div className='about-text-wrapper'>About This App</div>
+                                <div className='tech-text-wrapper'>Front-end tech stack</div>
+                                <div className='front-end-logos-container logos-container'>
+                                    <div className='react-logo-wrapper logo-wrapper'>
+                                        <img src='/img/logos/react-logo.png'/>
+                                        <div className='logo-text-wrapper'>React</div>
                                     </div>
-                                    <div className='tech-text-wrapper'>Back-end tech stack</div>
-                                    <div className='back-end-logos-container logos-container'>
-                                        <div className='nodejs-logo-wrapper logo-wrapper'><img src='/img/logos/nodejs-logo2.png'/><div className='logo-text-wrapper'>Node.js</div></div>
-                                        <div className='logo-wrapper'><img src='/img/logos/expressjs-logo2.png'/><div className='logo-text-wrapper'>Express.js</div></div>
-                                        <div className='mongodb-logo-wrapper logo-wrapper'><img src='/img/logos/mongodb-logo.png'/><div className='logo-text-wrapper'>MongoDBv</div></div>
-                                    </div>
-                                    <div className='tech-text-wrapper'>API</div>
-                                    <div className='api-logos-container logos-container'>
-                                        <div className='logo-wrapper'><img src='/img/logos/quandl-logo.png'/><div className='logo-text-wrapper'>Quandl</div></div>
-                                    </div>
-                                    <div className='tech-text-wrapper'>Key modules</div>
-                                    <div className='modules-logos-container logos-container'>
-                                        <div className='logo-wrapper'><img src='/img/logos/socketio-logo.gif'/><div className='logo-text-wrapper'>Socket.io</div></div>
-                                        <div className='logo-wrapper'><img src='/img/logos/highcharts-logo.png'/><div className='logo-text-wrapper'>Highcharts</div></div>
+                                    <div className='semantic-ui-logo-wrapper logo-wrapper'>
+                                        <img src='/img/logos/semantic-ui-logo.png'/>
+                                        <div className='logo-text-wrapper'>Semantic-UI-React</div>
                                     </div>
                                 </div>
-                            </Sidebar>
-                            {!visible ? <div className='arrow' onClick={toggleSidebar}>></div> : ''}
-                        </div>
-                    </Route>
-                </Switch>
+                                <div className='tech-text-wrapper'>Back-end tech stack</div>
+                                <div className='back-end-logos-container logos-container'>
+                                    <div className='nodejs-logo-wrapper logo-wrapper'>
+                                        <img src='/img/logos/nodejs-logo2.png'/>
+                                        <div className='logo-text-wrapper'>Node.js</div>
+                                    </div>
+                                    <div className='logo-wrapper'>
+                                        <img src='/img/logos/expressjs-logo2.png'/>
+                                        <div className='logo-text-wrapper'>Express.js</div>
+                                    </div>
+                                    <div className='mongodb-logo-wrapper logo-wrapper'>
+                                        <img src='/img/logos/mongodb-logo.png'/>
+                                        <div className='logo-text-wrapper'>MongoDBv</div>
+                                    </div>
+                                </div>
+                                <div className='tech-text-wrapper'>API</div>
+                                <div className='api-logos-container logos-container'>
+                                    <div className='logo-wrapper'>
+                                        <img src='/img/logos/quandl-logo.png'/>
+                                        <div className='logo-text-wrapper'>Quandl</div>
+                                    </div>
+                                </div>
+                                <div className='tech-text-wrapper'>Key modules</div>
+                                <div className='modules-logos-container logos-container'>
+                                    <div className='logo-wrapper'>
+                                        <img src='/img/logos/socketio-logo.gif'/>
+                                        <div className='logo-text-wrapper'>Socket.io</div>
+                                    </div>
+                                    <div className='logo-wrapper'>
+                                        <img src='/img/logos/highcharts-logo.png'/>
+                                        <div className='logo-text-wrapper'>Highcharts</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </Sidebar>
+                        {!visible ? <div className='arrow' onClick={toggleSidebar}>></div> : ''}
+                    </div>
             </div>
-            // {/* <div className='app-container'>
-            //     <div className='chart-container'></div>
-            //     <div className='cards-container'>
-            //         {stockInfo.map((si, i) => {
-            //             const sym = si[0];
-            //             const name = si[1];
-            //             return (<div className='transition-wrapper' onMouseEnter={(evt) => {registerCardSymbol(evt); toggleIcon()}}
-            //                 onMouseLeave={(evt) => {deregisterCardSymbol(evt); toggleIconOff()}} id={sym} key={i} >
-            //                 <Transition animation='fade up' duration={300} transitionOnMount={true}>
-            //                     <div className='card-wrapper'>
-            //                         <div className='stock-card' id={sym} >
-            //                             <div className='stock-symbol-wrapper'>{sym}</div>
-            //                             <div className='stock-name-wrapper'>{name}</div>
-            //                             {icon && (cardSymbol === sym) ? <Icon onClick={(evt) => {removeStock(evt); /*registerCardSymbol(evt); toggleIcon()*/}}
-            //                                 id={sym} className='icon' color='grey' name='delete'></Icon> : ''}
-            //                         </div>
-            //                     </div>
-            //                 </Transition>
-            //             </div>)
-            //         })}
-            //     </div>
-            //
-            //     <div className='search-container'>
-            //         <div className='search-wrapper'>
-            //             <input onChange={handleInput} onKeyDown={handleKeyDown} type='text' placeholder='Enter a stock symbol..' value={value}/>
-            //             <div className='button' onClick={handleSubmit}>ADD</div>
-            //         </div>
-            //         <div className='cards-full-container'>
-            //             <div className='cards-full-msg-wrapper'>{cardsFull ? 'Maximum number of chartable stocks reached.' : ''}</div>
-            //             <div className='error-msg-wrapper'>{error ? 'Provided stock code didn\'t yield any results.' : ''}</div>
-            //         </div>
-            //     </div>
-            //
-            // </div> */}
         );
     }
 }
