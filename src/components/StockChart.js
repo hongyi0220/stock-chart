@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Transition,
   Icon,
+  Loader,
 } from 'semantic-ui-react';
 import socketIOClient from 'socket.io-client';
 import Highcharts from 'highcharts/highstock';
@@ -26,6 +27,7 @@ export default class StockChart extends React.Component {
     mousedOverCardSymbol: null,
     cardsFull: false,
     error: null,
+    loader: false,
   };
 
   componentDidMount() {
@@ -39,23 +41,26 @@ export default class StockChart extends React.Component {
       this.setState({ stockNames: names });
     });
     socket.on('stock data', stockData => {
-      const stockSymbols = this.state.stockSymbols;
-      this.setState({ stockData: stockData });
-      this.buildChart(chartContainer)(stockData, stockSymbols);
+      // const stockSymbols = this.state.stockSymbols;
+      this.setState({ stockData, }, () => {
+        console.log('state after getting data from socketio:', this.state);
+        this.buildChart(chartContainer)(this.state.stockData, this.state.stockSymbols);
+      });
+      // this.buildChart(chartContainer)(stockData, stockSymbols);
     });
 
     if (localStorage) {
       const visited = localStorage.getItem('visited');
       if (!visited) {
-        console.log('no visit info in localStorage getting stock data ');
         localStorage.setItem('visited', 'true');
 
         this.getStockData()
           .then(packagedData => {
-            this.unpackStockData(packagedData);
-            this.buildChart(chartContainer)(this.state.stockData, this.state.stockSymbols);
+            const build = this.buildChart(chartContainer);
+
+            this.unpackStockData(packagedData, build);
           })
-          .catch(err => console.error(err));
+          .catch(err => console.log(err));
       }
     }
 
@@ -86,10 +91,10 @@ export default class StockChart extends React.Component {
       .then(resJson => {
         const stockName = resJson.dataset.name.slice(0, resJson.dataset.name.indexOf('(')).trim();
         state.stockNames.push(stockName);
-        this.setState({ state });
+        this.setState(state);
         return stockName;
       })
-      .catch(err => console.error(err));
+      .catch(err => console.log(err));
   }
 
   // Get stock time-series data with Quandl API
@@ -112,19 +117,17 @@ export default class StockChart extends React.Component {
         return transformedData;
       })
       .catch(err => {
-        console.error(err);
+        console.log(err);
         this.setState({ error: true });
       });
   }
 
   transformData = data => {
-    console.log('original data:', data);
     return data['dataset_data'].data.map(d => {
       //d = ["Date", "Open", "High", "Low", "Close", "Volume", "Ex-Dividend", "Split Ratio", "Adj. Open", "Adj. High", "Adj. Low", "Adj. Close", "Adj. Volume"]
       const dateString = d[0];
       const date = Date.parse(dateString);
       const stockValue = d[4];
-      console.log('stockValue:', stockValue);
       return [date, stockValue];
     }).reverse();
   }
@@ -145,28 +148,32 @@ export default class StockChart extends React.Component {
 
   handleAddButtonClick = () => {
     const socket = socketIOClient();
-    const state = {...this.state};
-    const input = state.input;
-    const symbol = input.trim().toUpperCase();
+    var state = {...this.state};
+    const symbol = state.input.trim().toUpperCase();
     const stockSymbols = state.stockSymbols;
     const hasSymbol = stockSymbols.includes(symbol);
     const cardsFull = stockSymbols.length >= 5;
 
-    this.setState({ cardsFull, input: '', });
+    this.setState({ cardsFull, loader: true, });
 
     if (!hasSymbol && !cardsFull) {
       this.getStockTimeSeriesData(symbol)
         .then(stockData => {
           if (stockData) {
+            console.log('stockData at handleAddButtonClick:', stockData);
             var packagingStockData = this.packageStockData(symbol, stockData);
-            
-            stockSymbols.push(symbol);
 
+            stockSymbols.push(symbol);
+            state.loader = false;
+            state.input = '';
             this.getStockName(symbol)
               .then(name => {
                 const packagedStockData = packagingStockData(name);
-                this.setState({ state }, () => {
+                state.stockData.push(stockData);
+                console.log('packagedStockData:', packagedStockData);
+                this.setState(state, () => {
                   // Emit stock data to server with socket.io
+                  console.log('stockData before emitting:', stockData);
                   socket.emit('stock symbols', this.state.stockSymbols);
                   socket.emit('stock names', this.state.stockNames);
                   socket.emit('stock data', this.state.stockData);
@@ -181,10 +188,10 @@ export default class StockChart extends React.Component {
 
   // Build stock chart
   buildChart = where => {
-    const defaultData = this.state.stockData;
-    const defaultSymbols = this.state.stockSymbols;
-
-    return function build(stockData = defaultData, stockSymbols = defaultSymbols) {
+    const defaultStockData = this.state.stockData;
+    const defaultStockSymbols = this.state.stockSymbols;
+    return function(stockData = defaultStockData, stockSymbols = defaultStockSymbols) {
+      console.log('stockData:', stockData, 'stockSymbols:', stockSymbols);
       const series = [];
 
       stockSymbols.forEach((sym, i) => {
@@ -196,14 +203,14 @@ export default class StockChart extends React.Component {
           },
         });
       });
-
+      console.log('series:', series);
       new Highcharts.stockChart(where, {
         rangeSelector: {
           selected: 1
         },
-        title:  {
-          text: 'Stock Chart'
-        },
+        // title:  {
+        //   text: 'Stock Chart'
+        // },
         series: series,
       });
     };
@@ -222,25 +229,27 @@ export default class StockChart extends React.Component {
 
   // Format packaged data from DB into 3 seperate data: stock symbols, names, and time-series data
   //these are used to build stock chart
-  unpackStockData = packagedData => {
+  unpackStockData = (packagedData, build) => {
     let stockSymbols = [];
     let stockData = [];
     let stockNames = [];
     packagedData.forEach(datum => {
       stockSymbols.push(datum.stockSymbol);
-      stockData.push(datum.stockDatum);
+      stockData.push(datum.stockData);
       stockNames.push(datum.stockName);
     });
     if (!stockSymbols.length) {
-      stockSymbols = ['EXMPL'];
-      stockData = [ [[1395878400000,388.46],[1395964800000,459.99],[1396224000000,556.97],[1396310400000,367.16],[1396396800000,567],[1396483200000,369.74],[1396569600000,443.14],[1396828800000,538.15],[1396915200000,554.9],[1397001600000,664.14]] ];
-      stockNames = ['Example Inc.'];
+      const placeholderSymbols = ['EXMPL'];
+      const placeholderData = [ [[1395878400000,388.46],[1395964800000,459.99],[1396224000000,556.97],[1396310400000,367.16],[1396396800000,567],[1396483200000,369.74],[1396569600000,443.14],[1396828800000,538.15],[1396915200000,554.9],[1397001600000,664.14]] ];
+      build(placeholderData, placeholderSymbols);
+    } else {
+      this.setState({
+        stockSymbols,
+        stockData,
+        stockNames,
+      }, () => build(stockData, stockSymbols));
     }
-    this.setState({
-      stockSymbols,
-      stockData,
-      stockNames,
-    });
+
   }
   // Send packaged stock data to be stored in database
   storeStockData = packagedStockData => {
@@ -253,7 +262,7 @@ export default class StockChart extends React.Component {
         packagedStockData,
       }),
     })
-      .catch(err => console.error(err));
+      .catch(err => console.log(err));
   }
 
   // Retrieve stock data from database
@@ -263,7 +272,7 @@ export default class StockChart extends React.Component {
     })
       .then(res => res.json())
       .then(resJson => resJson)
-      .catch(err => console.error(err));
+      .catch(err => console.log(err));
   }
 
   // Remove a particular stock datum from state and database
@@ -276,7 +285,7 @@ export default class StockChart extends React.Component {
     fetch(`/stock${query}`, {
       method: 'DELETE',
     })
-      .catch(err => console.error(err));
+      .catch(err => console.log(err));
 
     const state = {...this.state};
     const stockSymbolIndex = state.stockSymbols.indexOf(symbol);
@@ -284,7 +293,7 @@ export default class StockChart extends React.Component {
     state.stockData.splice(stockSymbolIndex, 1);
     state.stockNames.splice(stockSymbolIndex, 1);
 
-    this.setState({ state }, () => {
+    this.setState(state, () => {
       socket.emit('stock symbols', this.state.stockSymbols);
       socket.emit('stock names', this.state.stockNames);
       socket.emit('stock data', this.state.stockData);
@@ -344,8 +353,8 @@ export default class StockChart extends React.Component {
 
         <div className='search-bar-container'>
           <div className='search-bar-wrapper'>
-            <input onChange={this.handleInputChange} onKeyDown={this.handleInputKeyDown} type='text' placeholder='Enter a stock symbol..' value={this.state.input}/>
-            <div className='button' onClick={this.handleAddButtonClick}>ADD</div>
+            <input onChange={this.handleInputChange} onKeyDown={this.handleInputKeyDown} type='text' placeholder='Enter a stock symbol.' value={this.state.input}/>
+            <div className='button' onClick={this.handleAddButtonClick}>{this.state.loader ? <Loader active inline/> : 'ADD'}</div>
           </div>
           <div className='msgs-container'>
             <div className='msg-wrapper'>
