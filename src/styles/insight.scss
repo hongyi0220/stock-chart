@@ -1,0 +1,28 @@
+.stock-insight-card-wrapper {
+  position: absolute;
+  top: calc(26% - 403.16px / 2);
+  left: calc(50% - 290px / 2);
+  z-index: 2;
+  .ui.card {
+    background-color: black;
+    .image {
+      margin: auto;
+    }
+    .content {
+      .header {
+        color: white;
+      }
+      .meta {
+        color: gray;
+      }
+      .description {
+        color: white;
+      }
+    }
+    .extra.content {
+      a {
+        color: gray;
+      }
+    }
+  }
+}

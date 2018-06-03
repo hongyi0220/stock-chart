@@ -1,5 +1,5 @@
-@import './variables';
-@import './mixins';
+@import 'variables';
+@import 'mixins';
 * {
   box-sizing: border-box;
   margin: 0;
@@ -13,6 +13,6 @@ html {
 }
 .app-container {
   overflow: scroll;
-  @import './home';
-  @import './stock-chart';
+  @import 'home';
+  @import 'stock-chart';
 }

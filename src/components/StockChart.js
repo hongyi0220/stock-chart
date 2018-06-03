@@ -8,6 +8,7 @@ import socketIOClient from 'socket.io-client';
 import Highcharts from 'highcharts/highstock';
 import { theme } from '../theme';
 import PropTypes from 'prop-types';
+import Insight from './Insight';
 
 export default class StockChart extends React.Component {
   static propTypes = {
@@ -16,7 +17,7 @@ export default class StockChart extends React.Component {
       location: PropTypes.shape({
         pathname: PropTypes.string
       })
-    }),
+    }).isRequired,
   };
   state = {
     input: '',
@@ -28,6 +29,7 @@ export default class StockChart extends React.Component {
     cardsFull: false,
     error: null,
     loader: false,
+    insight: false,
   };
 
   componentDidMount() {
@@ -41,12 +43,9 @@ export default class StockChart extends React.Component {
       this.setState({ stockNames: names });
     });
     socket.on('stock data', stockData => {
-      // const stockSymbols = this.state.stockSymbols;
       this.setState({ stockData, }, () => {
-        console.log('state after getting data from socketio:', this.state);
         this.buildChart(chartContainer)(this.state.stockData, this.state.stockSymbols);
       });
-      // this.buildChart(chartContainer)(stockData, stockSymbols);
     });
 
     if (localStorage) {
@@ -81,8 +80,8 @@ export default class StockChart extends React.Component {
   }
 
   // Get sotck data
-  getStockName = async stockSymbol => {
-    const apiKey = await this.getApiKey();
+  getStockMetadata = async stockSymbol => {
+    const apiKey = await this.getApiKey().catch(err => console.log(err));
     const url = `https://www.quandl.com/api/v3/datasets/WIKI/${stockSymbol}/metadata.json?api_key=${apiKey}`;
     const state = {...this.state};
 
@@ -90,6 +89,7 @@ export default class StockChart extends React.Component {
       .then(res => res.json())
       .then(resJson => {
         const stockName = resJson.dataset.name.slice(0, resJson.dataset.name.indexOf('(')).trim();
+
         state.stockNames.push(stockName);
         this.setState(state);
         return stockName;
@@ -99,7 +99,7 @@ export default class StockChart extends React.Component {
 
   // Get stock time-series data with Quandl API
   getStockTimeSeriesData = async stockSymbol => {
-    const apiKey = await this.getApiKey();
+    const apiKey = await this.getApiKey().catch(err => console.log(err));
     const url = `https://www.quandl.com/api/v3/datasets/WIKI/${stockSymbol}/data.json?api_key=${apiKey}`;
     const state = {...this.state};
     const stockData = state.stockData;
@@ -118,7 +118,7 @@ export default class StockChart extends React.Component {
       })
       .catch(err => {
         console.log(err);
-        this.setState({ error: true });
+        this.setState({ error: true, loader: false, });
       });
   }
 
@@ -160,20 +160,18 @@ export default class StockChart extends React.Component {
       this.getStockTimeSeriesData(symbol)
         .then(stockData => {
           if (stockData) {
-            console.log('stockData at handleAddButtonClick:', stockData);
             var packagingStockData = this.packageStockData(symbol, stockData);
 
             stockSymbols.push(symbol);
             state.loader = false;
             state.input = '';
-            this.getStockName(symbol)
+            this.getStockMetadata(symbol)
               .then(name => {
                 const packagedStockData = packagingStockData(name);
+
                 state.stockData.push(stockData);
-                console.log('packagedStockData:', packagedStockData);
                 this.setState(state, () => {
                   // Emit stock data to server with socket.io
-                  console.log('stockData before emitting:', stockData);
                   socket.emit('stock symbols', this.state.stockSymbols);
                   socket.emit('stock names', this.state.stockNames);
                   socket.emit('stock data', this.state.stockData);
@@ -182,7 +180,9 @@ export default class StockChart extends React.Component {
               });
           }
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+          console.log(err);
+        });
     }
   }
 
@@ -191,7 +191,6 @@ export default class StockChart extends React.Component {
     const defaultStockData = this.state.stockData;
     const defaultStockSymbols = this.state.stockSymbols;
     return function(stockData = defaultStockData, stockSymbols = defaultStockSymbols) {
-      console.log('stockData:', stockData, 'stockSymbols:', stockSymbols);
       const series = [];
 
       stockSymbols.forEach((sym, i) => {
@@ -203,14 +202,10 @@ export default class StockChart extends React.Component {
           },
         });
       });
-      console.log('series:', series);
       new Highcharts.stockChart(where, {
         rangeSelector: {
           selected: 1
         },
-        // title:  {
-        //   text: 'Stock Chart'
-        // },
         series: series,
       });
     };
@@ -305,7 +300,6 @@ export default class StockChart extends React.Component {
 
   // Set stock symbol in state for mouse-over event
   registerCardSymbol = evt => {
-    evt.stopPropagation();
     this.setState({
       mousedOverCardSymbol: evt.target.dataset.symbol,
     });
@@ -319,29 +313,39 @@ export default class StockChart extends React.Component {
     });
   }
 
+  handleStockCardClick = evt => {
+    evt.stopPropagation();
+    this.setState({ insight: true, });
+  }
+
+  closeStockInsightCard = evt => {
+    evt.stopPropagation();
+    this.setState({ insight: false, });
+  }
+
   render() {
     const stockInfo = this.state.stockSymbols.map((sym,i) => [sym, this.state.stockNames[i]]);
 
     return (
-      <div className='stock-chart-page-container'>
+      <div className='stock-chart-page-container' onClick={this.closeStockInsightCard}>
         <div className='logo-wrapper' onClick={() => {this.props.history.push('/');}}>
             <img className='back-arrow' src='/img/back-arrow.png' alt='go back'/>
         </div>
-        <div className='chart-container'>
-        </div>
+        <div className='chart-container'></div>
+        {this.state.insight && <Insight />}
         <div className='cards-container'>
           {stockInfo.map((si, i) => {
             const sym = si[0];
             const name = si[1];
             return (
-              <div className='transition-wrapper' key={i} onMouseLeave={this.deregisterCardSymbol}>
-                <Transition animation='fade' duration={600} transitionOnMount={true}>
+              <div className='transition-wrapper' key={i} onMouseLeave={this.deregisterCardSymbol} onClick={this.handleStockCardClick} onMouseOver={this.registerCardSymbol}>
+                <Transition animation='swing down' duration={600} transitionOnMount={true}>
                   <div className='stock-card'>
-                    <div className='stock-symbol-wrapper' data-symbol={sym} onMouseOver={this.registerCardSymbol}>
+                    <div className='stock-symbol-wrapper' data-symbol={sym}>
                       {sym}
                     </div>
-                    <div className='stock-name-wrapper' data-symbol={sym} onMouseOver={this.registerCardSymbol}>
-                      {name}
+                    <div className='stock-name-wrapper' data-symbol={sym}>
+                      <span data-symbol={sym}>{name}</span>
                     </div>
                     {this.state.mousedOverCardSymbol === sym && <Icon data-symbol={sym} onClick={this.removeStock} className='icon' color='grey' name='delete'></Icon>}
                   </div>
