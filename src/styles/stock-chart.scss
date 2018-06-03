@@ -1,0 +1,110 @@
+.stock-chart-page-container {
+  display: block;
+  background-color: black;
+  @include logo(65px);
+  .chart-container {
+    margin: auto;
+    width: 80%;
+    height: 400px;
+  }
+  .cards-container {
+    margin: .7em auto;
+    width: 80%;
+    .transition-wrapper {
+      display: inline-block;
+      margin: 0.2em;
+      padding: 10px;
+      vertical-align: top;
+      .stock-card {
+        text-align: center;
+        position: relative;
+        border: 1px solid gray;
+        border-radius: 3px;
+        width: $card-width;
+        height: $card-height * .975;
+        margin: auto;
+        top: calc(50% - $card-height / 2);
+        transition: all 0.35s ease;
+        color: white;
+        &:hover {
+          border: 1px solid orange;
+        }
+        .stock-symbol-wrapper {
+          border-bottom: 1px solid gray;
+          height: $card-height * .975 * (1/4);
+          &:hover {
+            cursor: pointer;
+          }
+        }
+        .stock-name-wrapper {
+          height: $card-height * .975 * (3/4);
+          &:hover {
+            cursor: pointer;
+          }
+        }
+        .icon {
+          position: absolute;
+          top: 0;
+          right: 0;
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+  .search-bar-container {
+    margin: 0 auto;
+    width: 80%;
+    padding-bottom: 1.5em;
+    .search-bar-wrapper {
+      height: 40px;
+      width: 95%;
+      white-space: nowrap;
+      input {
+        vertical-align: top;
+        display: inline-block;
+        width: 85%;
+        border: 1px solid grey;
+        height: 100%;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+        margin-right: 0.2em;
+        padding-left: 1em;
+        background-color: black;
+        transition: all 0.2s linear;
+        &:focus {
+          outline: none;
+          border-color: white;
+          color: white;
+          &::placeholder {
+            color: white;
+          }
+        }
+      }
+      .button {
+        display: inline-block;
+        border: 1px solid grey;
+        height: 100%;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        width: 14.5%;
+        line-height: 40px;
+        text-align: center;
+        color: grey;
+        transition: all 0.2s ease;
+        &:hover {
+          border-color: white;
+          color: white;
+          cursor: pointer;
+        }
+      }
+    }
+    .msgs-container {
+      width: 100%;
+      .msg-wrapper {
+        color: white;
+      }
+    }
+  }
+}

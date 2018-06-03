@@ -1,0 +1,54 @@
+.sidebar {
+  background: rgba(0,0,0,0.5);
+  color: white;
+  .about-this-app-container {
+    position: relative;
+    text-align: center;
+    height: 390px;
+    top: calc(50% - 390px / 1.5);
+    .about-text-wrapper {
+      margin-bottom: 1.5em;
+      font-size: 1.9em;
+    }
+    .tech-text-wrapper {
+      font-size: 1.3em;
+      margin-top: .8em;
+    }
+    .logos-container {
+      font-size: 1em;
+      .logo-container {
+        margin: .3em;
+        padding: 0 .5em 0 .5em;
+        display: inline-block;
+        background: rgb(50,50,50);
+        border-radius: 5px;
+        .logo-text-wrapper {
+          display: inline-block;
+          height: 50px;
+          line-height: 50px;
+        }
+        img {
+          height: 50px;
+          width: auto;
+        }
+      }
+      .semantic, .express, .quandl, .socketio, .highcharts {
+        img {
+          padding: 0 .5em;
+        }
+      }
+      .logo-container > * {
+        vertical-align: top;
+      }
+    }
+    .attribution {
+      a {
+        color: white;
+        transition: all .3s ease;
+        &:hover {
+          color: $stock-teal;
+        }
+      }
+    }
+  }
+}

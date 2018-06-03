@@ -1,0 +1,15 @@
+@mixin logo($width: 80px) {
+  .logo-wrapper {
+    width: $width;
+    padding: 1em 0 0 1em;
+    img {
+      width: 100%;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
