@@ -4,102 +4,96 @@
   border: 0; }
 
 html {
-  background-color: black;
-  margin: 0;
-  height: 100%; }
+  background-color: black; }
   html body {
-    background-color: black;
-    height: 100%; }
-  html .container-all .logo-wrapper {
-    margin: .5em 0 0 1em; }
-    html .container-all .logo-wrapper img {
-      height: 55px; }
-      html .container-all .logo-wrapper img:hover {
-        cursor: pointer; }
-    html .container-all .logo-wrapper:hover {
-      cursor: pointer; }
-  html .container-all .gloss {
+    background-color: black; }
+
+.app-container {
+  overflow: scroll; }
+  .app-container .home-page-container {
     position: absolute;
     background: url("/img/stock.jpeg") no-repeat center;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%; }
-    html .container-all .gloss .view-chart-wrapper {
+    height: 100vh; }
+    .app-container .home-page-container .logo-wrapper {
+      width: 90px;
+      padding: 1em 0 0 1em; }
+      .app-container .home-page-container .logo-wrapper img {
+        width: 100%; }
+        .app-container .home-page-container .logo-wrapper img:hover {
+          cursor: pointer; }
+      .app-container .home-page-container .logo-wrapper:hover {
+        cursor: pointer; }
+    .app-container .home-page-container .view-chart-container {
       position: relative;
       text-align: center;
       top: 50%;
-      transform: translateY(-111px); }
-      html .container-all .gloss .view-chart-wrapper img {
-        height: 80px; }
-        html .container-all .gloss .view-chart-wrapper img:hover {
+      transform: translateY(-111px);
+      width: 100px;
+      margin: auto; }
+      .app-container .home-page-container .view-chart-container img {
+        height: 70px; }
+        .app-container .home-page-container .view-chart-container img:hover {
           cursor: pointer; }
-      html .container-all .gloss .view-chart-wrapper .view-chart-text-wrapper {
+      .app-container .home-page-container .view-chart-container .view-chart-text-wrapper {
         color: white;
-        transition: all .3s ease; }
-        html .container-all .gloss .view-chart-wrapper .view-chart-text-wrapper:hover {
+        transition: all .3s linear; }
+        .app-container .home-page-container .view-chart-container .view-chart-text-wrapper:hover {
           cursor: pointer;
           color: #67f3fe; }
-      html .container-all .gloss .view-chart-wrapper .subtitle-wrapper {
-        color: white; }
-    html .container-all .gloss .sidebar {
-      background: rgba(0, 0, 0, 0.5);
+    .app-container .home-page-container .sidebar {
+      background-color: black;
       color: white; }
-      html .container-all .gloss .sidebar .about-container {
+      .app-container .home-page-container .sidebar .about-this-app-container {
         position: relative;
         text-align: center;
         height: 390px;
-        top: 50%;
-        transform: translateY(-200px); }
-        html .container-all .gloss .sidebar .about-container .about-text-wrapper {
+        top: calc(50% - 390px / 1.5); }
+        .app-container .home-page-container .sidebar .about-this-app-container .about-text-wrapper {
           margin-bottom: 1.5em;
           font-size: 1.9em; }
-        html .container-all .gloss .sidebar .about-container .tech-text-wrapper {
-          font-size: 1.3em; }
-        html .container-all .gloss .sidebar .about-container .logos-container {
+        .app-container .home-page-container .sidebar .about-this-app-container .tech-text-wrapper {
+          font-size: 1.3em;
+          margin-top: .8em;
+          color: #67f3fe;
+          font-weight: 800; }
+        .app-container .home-page-container .sidebar .about-this-app-container .logos-container {
           font-size: 1em; }
-          html .container-all .gloss .sidebar .about-container .logos-container .logo-wrapper {
+          .app-container .home-page-container .sidebar .about-this-app-container .logos-container .logo-container {
             margin: .3em;
             padding: 0 .5em 0 .5em;
             display: inline-block;
-            background: #323232;
             border-radius: 5px; }
-            html .container-all .gloss .sidebar .about-container .logos-container .logo-wrapper .logo-text-wrapper {
+            .app-container .home-page-container .sidebar .about-this-app-container .logos-container .logo-container .logo-text-wrapper {
               display: inline-block;
               height: 50px;
               line-height: 50px; }
-            html .container-all .gloss .sidebar .about-container .logos-container .logo-wrapper img {
-              height: 50px; }
-          html .container-all .gloss .sidebar .about-container .logos-container .react-logo-wrapper {
-            padding: 0 1em 0 0em; }
-          html .container-all .gloss .sidebar .about-container .logos-container .semantic-ui-logo-wrapper img {
-            margin-right: .5em; }
-          html .container-all .gloss .sidebar .about-container .logos-container .nodejs-logo-wrapper {
-            padding: 0 .8em 0 0em; }
-          html .container-all .gloss .sidebar .about-container .logos-container .mongodb-logo-wrapper {
-            padding: 0 .9em 0 0em; }
-          html .container-all .gloss .sidebar .about-container .logos-container .socketio-logo-wrapper img {
-            margin-right: .5em; }
-          html .container-all .gloss .sidebar .about-container .logos-container .logo-wrapper > * {
+            .app-container .home-page-container .sidebar .about-this-app-container .logos-container .logo-container img {
+              height: 50px;
+              width: auto; }
+          .app-container .home-page-container .sidebar .about-this-app-container .logos-container .semantic img, .app-container .home-page-container .sidebar .about-this-app-container .logos-container .express img, .app-container .home-page-container .sidebar .about-this-app-container .logos-container .quandl img, .app-container .home-page-container .sidebar .about-this-app-container .logos-container .socketio img, .app-container .home-page-container .sidebar .about-this-app-container .logos-container .highcharts img {
+            padding: 0 .5em; }
+          .app-container .home-page-container .sidebar .about-this-app-container .logos-container .logo-container > * {
             vertical-align: top; }
-      html .container-all .gloss .sidebar .attribution a {
-        color: white;
-        transition: all .3s ease; }
-        html .container-all .gloss .sidebar .attribution a:hover {
-          color: #67f3fe; }
-    html .container-all .gloss .arrow {
+        .app-container .home-page-container .sidebar .about-this-app-container .attribution a {
+          color: white;
+          transition: all .3s ease; }
+          .app-container .home-page-container .sidebar .about-this-app-container .attribution a:hover {
+            color: #67f3fe; }
+    .app-container .home-page-container .arrow {
       position: absolute;
       display: inline-block;
-      top: 50%;
+      top: calc(50% - 16px);
       width: 32px;
       height: 32px;
-      transform: translateY(-16px);
       color: white;
       font-size: 4em;
       font-weight: 500;
       transition: all 0.3s ease;
-      animation: 0.5s infinite alternate slidein; }
-      html .container-all .gloss .arrow:hover {
+      animation: .7s infinite alternate slidein; }
+      .app-container .home-page-container .arrow:hover {
         color: #67f3fe;
         cursor: pointer; }
 
@@ -107,123 +101,144 @@ html {
   from {
     margin-left: 0; }
   to {
-    margin-left: 0.15em; } }
-  html .container-all .app-container {
+    margin-left: 0.1em; } }
+    .app-container .home-page-container .footer {
+      width: 77px;
+      position: absolute;
+      margin: auto;
+      left: calc(50% - 77px / 2);
+      bottom: .9em;
+      color: white; }
+      .app-container .home-page-container .footer a {
+        color: white;
+        transition: all .3s ease;
+        display: inline-block;
+        line-height: 30px; }
+        .app-container .home-page-container .footer a:hover {
+          color: #67f3fe; }
+      .app-container .home-page-container .footer hr {
+        border-color: white;
+        border-style: inset;
+        border-width: 1px;
+        width: .6em;
+        transform: rotate(90deg);
+        display: inline-block;
+        vertical-align: middle;
+        margin: 0 .35em; }
+  .app-container .stock-chart-page-container {
     display: block;
     background-color: black; }
-    html .container-all .app-container .chart-container {
+    .app-container .stock-chart-page-container .logo-wrapper {
+      width: 65px;
+      padding: 1em 0 0 1em; }
+      .app-container .stock-chart-page-container .logo-wrapper img {
+        width: 100%; }
+        .app-container .stock-chart-page-container .logo-wrapper img:hover {
+          cursor: pointer; }
+      .app-container .stock-chart-page-container .logo-wrapper:hover {
+        cursor: pointer; }
+    .app-container .stock-chart-page-container .chart-container {
       margin: auto;
       width: 80%;
       height: 400px; }
-    html .container-all .app-container .cards-container {
-      margin: auto;
-      margin-top: 1.5em;
+    .app-container .stock-chart-page-container .stock-insight-card-wrapper {
+      position: absolute;
+      top: calc(26% - 403.16px / 2);
+      left: calc(50% - 290px / 2);
+      z-index: 2; }
+      .app-container .stock-chart-page-container .stock-insight-card-wrapper .ui.card {
+        background-color: black; }
+        .app-container .stock-chart-page-container .stock-insight-card-wrapper .ui.card .image {
+          margin: auto; }
+        .app-container .stock-chart-page-container .stock-insight-card-wrapper .ui.card .content .header {
+          color: white; }
+        .app-container .stock-chart-page-container .stock-insight-card-wrapper .ui.card .content .meta {
+          color: gray; }
+        .app-container .stock-chart-page-container .stock-insight-card-wrapper .ui.card .content .description {
+          color: white; }
+        .app-container .stock-chart-page-container .stock-insight-card-wrapper .ui.card .extra.content a {
+          color: gray; }
+    .app-container .stock-chart-page-container .cards-container {
+      margin: .7em auto;
       width: 80%; }
-      html .container-all .app-container .cards-container .transition-wrapper {
+      .app-container .stock-chart-page-container .cards-container .transition-wrapper {
         display: inline-block;
         margin: 0.2em;
-        width: 150px;
-        height: 90px;
+        padding: 10px;
         vertical-align: top; }
-        html .container-all .app-container .cards-container .transition-wrapper .card-wrapper {
+        .app-container .stock-chart-page-container .cards-container .transition-wrapper .stock-card {
+          text-align: center;
           position: relative;
-          border: 1px solid grey;
-          border-radius: 2px;
+          border: 1px solid gray;
+          border-radius: 3px;
           width: 140px;
-          height: 80px;
+          height: 78px;
           margin: auto;
-          top: 50%;
-          transform: translateY(-40px); }
-          html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .stock-card {
-            text-align: center;
-            border-left: 5px solid #67f3fe;
-            border-top-left-radius: 1px;
-            border-bottom-left-radius: 1px;
-            width: 140px;
-            height: 78px;
-            transition: all 0.3s ease;
-            color: white; }
-            html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .stock-card:hover {
-              border-left: 7px solid red;
-              border-top-left-radius: 1px;
-              border-bottom-left-radius: 2px; }
-            html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .stock-card .stock-symbol-wrapper {
-              height: 19.5px; }
-            html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .stock-card .stock-name-wrapper {
-              height: 58.5px; }
-          html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .icon {
+          top: calc(50% - $card-height / 2);
+          transition: all 0.35s ease;
+          color: white; }
+          .app-container .stock-chart-page-container .cards-container .transition-wrapper .stock-card:hover {
+            border: 1px solid orange; }
+          .app-container .stock-chart-page-container .cards-container .transition-wrapper .stock-card .stock-symbol-wrapper {
+            border-bottom: 1px solid gray;
+            height: 19.5px; }
+            .app-container .stock-chart-page-container .cards-container .transition-wrapper .stock-card .stock-symbol-wrapper:hover {
+              cursor: pointer; }
+          .app-container .stock-chart-page-container .cards-container .transition-wrapper .stock-card .stock-name-wrapper {
+            height: 58.5px; }
+            .app-container .stock-chart-page-container .cards-container .transition-wrapper .stock-card .stock-name-wrapper span {
+              position: relative;
+              top: calc(25%); }
+            .app-container .stock-chart-page-container .cards-container .transition-wrapper .stock-card .stock-name-wrapper:hover {
+              cursor: pointer; }
+          .app-container .stock-chart-page-container .cards-container .transition-wrapper .stock-card .icon {
             position: absolute;
             top: 0;
             right: 0; }
-            html .container-all .app-container .cards-container .transition-wrapper .card-wrapper .icon:hover {
+            .app-container .stock-chart-page-container .cards-container .transition-wrapper .stock-card .icon:hover {
               cursor: pointer; }
-    html .container-all .app-container .search-container {
-      width: 100%;
-      margin: 2em 0 1.5em 0; }
-      html .container-all .app-container .search-container .search-wrapper {
+    .app-container .stock-chart-page-container .search-bar-container {
+      margin: 0 auto;
+      width: 80%;
+      padding-bottom: 1.5em; }
+      .app-container .stock-chart-page-container .search-bar-container .search-bar-wrapper {
         height: 40px;
-        margin: auto;
-        width: 60%;
-        display: flex;
-        flex-direction: row; }
-        html .container-all .app-container .search-container .search-wrapper input {
-          flex-grow: 8.5;
-          border: 2px solid grey;
+        width: 95%;
+        white-space: nowrap; }
+        .app-container .stock-chart-page-container .search-bar-container .search-bar-wrapper input {
+          vertical-align: top;
+          display: inline-block;
+          width: 85%;
+          border: 1px solid grey;
           height: 100%;
           border-top-left-radius: 5px;
           border-bottom-left-radius: 5px;
           margin-right: 0.2em;
           padding-left: 1em;
           background-color: black;
-          transition: all 0.2s ease; }
-          html .container-all .app-container .search-container .search-wrapper input:focus {
+          transition: all 0.2s linear; }
+          .app-container .stock-chart-page-container .search-bar-container .search-bar-wrapper input:focus {
             outline: none;
-            border: 1px solid white;
+            border-color: white;
             color: white; }
-            html .container-all .app-container .search-container .search-wrapper input:focus::placeholder {
+            .app-container .stock-chart-page-container .search-bar-container .search-bar-wrapper input:focus::placeholder {
               color: white; }
-        html .container-all .app-container .search-container .search-wrapper .button {
-          border: 2px solid grey;
+        .app-container .stock-chart-page-container .search-bar-container .search-bar-wrapper .button {
+          display: inline-block;
+          border: 1px solid grey;
           height: 100%;
           border-top-right-radius: 5px;
           border-bottom-right-radius: 5px;
-          flex-grow: 1.5;
+          width: 14.5%;
           line-height: 40px;
           text-align: center;
           color: grey;
           transition: all 0.2s ease; }
-          html .container-all .app-container .search-container .search-wrapper .button:hover {
-            border: 1px solid white;
+          .app-container .stock-chart-page-container .search-bar-container .search-bar-wrapper .button:hover {
+            border-color: white;
             color: white;
             cursor: pointer; }
-      html .container-all .app-container .search-container .cards-full-container {
+      .app-container .stock-chart-page-container .search-bar-container .msgs-container {
         width: 100%; }
-        html .container-all .app-container .search-container .cards-full-container .cards-full-msg-wrapper {
-          width: 60%;
-          margin: auto;
+        .app-container .stock-chart-page-container .search-bar-container .msgs-container .msg-wrapper {
           color: white; }
-        html .container-all .app-container .search-container .cards-full-container .error-msg-wrapper {
-          width: 60%;
-          margin: auto;
-          color: white; }
-  html .container-all .footer {
-    position: fixed;
-    left: 50%;
-    transform: translateX(-100px);
-    bottom: .9em;
-    color: white; }
-    html .container-all .footer a {
-      color: white;
-      transition: all .3s ease;
-      display: inline-block;
-      line-height: 30px; }
-      html .container-all .footer a:hover {
-        color: #67f3fe; }
-    html .container-all .footer .github-wrapper {
-      vertical-align: bottom; }
-    html .container-all .footer .name-wrapper {
-      vertical-align: top; }
-    html .container-all .footer .seperator {
-      display: inline-block;
-      vertical-align: middle;
-      margin: 0 .2em 0 .2em; }
