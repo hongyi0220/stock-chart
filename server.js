@@ -11,11 +11,11 @@ const bodyParser = require('body-parser');
 const webpack = require('webpack');
 const webpackConfig = require('./webpack/webpack.dev.js');
 const compiler = webpack(webpackConfig);
-console.log('server loading');
 
 app.use(require('webpack-dev-middleware')(compiler, {
   publicPath: webpackConfig.output.publicPath
 }));
+
 app.use(require('webpack-hot-middleware')(compiler));
 
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -67,7 +67,6 @@ MongoClient.connect(dbUrl, (err, db) => {// eslint-disable-line no-unused-vars
 
     // Listen for change from clients, then emit to all users connected
     io.on('connection', function(socket) {
-      console.log('a user connected');
       socket.on('stock symbols', function(symbols) {
         socket.broadcast.emit('stock symbols', symbols);
       });
@@ -78,7 +77,6 @@ MongoClient.connect(dbUrl, (err, db) => {// eslint-disable-line no-unused-vars
         socket.broadcast.emit('stock data', stockData);
       });
       socket.on('disconnect', function() {
-        console.log('user disconnected');
       });
     });
   })();
