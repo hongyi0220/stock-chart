@@ -30,6 +30,8 @@ export default class StockChart extends React.Component {
     error: null,
     loader: false,
     insight: false,
+    tests: false,
+    rootTestDomain: 'http://localhost:3000',
   };
 
   componentDidMount() {
@@ -72,7 +74,9 @@ export default class StockChart extends React.Component {
   }
 
   getApiKey = () => {
-    return fetch('/key', {
+    const url = this.state.tests ? `${this.state.rootTestDomain}/key`: '/key';
+
+    return fetch(url, {
       method: 'GET',
     })
       .then(res => res.json())
@@ -248,7 +252,8 @@ export default class StockChart extends React.Component {
   }
   // Send packaged stock data to be stored in database
   storeStockData = packagedStockData => {
-    fetch('/stock', {
+    const url = this.state.tests ? `${this.state.rootTestDomain}/stock`: '/stock';
+    fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -262,7 +267,8 @@ export default class StockChart extends React.Component {
 
   // Retrieve stock data from database
   getStockData = () => {
-    return fetch('/stock', {
+    const url = this.state.tests ? `${this.state.rootTestDomain}/stock`: '/stock';
+    return fetch(url, {
       method: 'GET',
     })
       .then(res => res.json())

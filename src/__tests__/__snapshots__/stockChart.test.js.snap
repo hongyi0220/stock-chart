@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`StockChart should render 1`] = `
+<div
+  className="stock-chart-page-container"
+  onClick={[Function]}
+>
+  <div
+    className="logo-wrapper"
+    onClick={[Function]}
+  >
+    <img
+      alt="go back"
+      className="back-arrow"
+      src="/img/back-arrow.png"
+    />
+  </div>
+  <div
+    className="chart-container"
+  />
+  <div
+    className="cards-container"
+  />
+  <div
+    className="search-bar-container"
+  >
+    <div
+      className="search-bar-wrapper"
+    >
+      <input
+        onChange={[Function]}
+        onKeyDown={[Function]}
+        placeholder="Enter a stock symbol."
+        type="text"
+        value=""
+      />
+      <div
+        className="button"
+        onClick={[Function]}
+      >
+        ADD
+      </div>
+    </div>
+    <div
+      className="msgs-container"
+    >
+      <div
+        className="msg-wrapper"
+      />
+      <div
+        className="msg-wrapper"
+      />
+    </div>
+  </div>
+</div>
+`;

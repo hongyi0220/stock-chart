@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Insight should render 1`] = `
+<div
+  className="stock-insight-card-wrapper"
+>
+  <Transition
+    animation="fade down"
+    duration={600}
+    mountOnShow={true}
+    transitionOnMount={true}
+    unmountOnHide={false}
+    visible={true}
+  >
+    <Card>
+      <Image
+        as="img"
+        src="./img/company-logo-placeholder.jpg"
+        ui={true}
+      />
+      <CardContent>
+        <CardHeader>
+          ABC
+        </CardHeader>
+        <CardMeta>
+          <span
+            className="date"
+          >
+            IPO date: 2015
+          </span>
+        </CardMeta>
+        <CardDescription>
+          Week of 2018-03-29: 
+          <br />
+          open: 90.6100
+          <br />
+          high: 95.1390
+          <br />
+          low: 88.4000
+          <br />
+          close: 91.2700
+          <br />
+          adjusted close: 90.8771
+          <br />
+          volume: 207104405
+          <br />
+          dividend amount: 0.0000
+        </CardDescription>
+      </CardContent>
+      <CardContent
+        extra={true}
+      >
+        <a>
+          <Icon
+            as="i"
+            name="chart line"
+          />
+          Bull
+        </a>
+      </CardContent>
+    </Card>
+  </Transition>
+</div>
+`;

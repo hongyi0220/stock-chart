@@ -1,0 +1,203 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Home /> renders 1`] = `
+<div
+  class="home-page-container"
+>
+  <div
+    class="logo-wrapper"
+  >
+    <img
+      src="/img/logo2.png"
+    />
+  </div>
+  <div
+    class="view-chart-container"
+  >
+    <img
+      src="/img/line-chart2.png"
+    />
+    <div
+      class="view-chart-text-wrapper"
+    >
+      View Chart
+    </div>
+  </div>
+  <div
+    class="ui overlay left wide sidebar"
+  >
+    <div
+      class="about-this-app-container"
+    >
+      <div
+        class="about-text-wrapper"
+      >
+        About This App
+      </div>
+      <div
+        class="tech-text-wrapper"
+      >
+        Front-end tech stack
+      </div>
+      <div
+        class="front-end logos-container"
+      >
+        <div
+          class="react logo-container"
+        >
+          <img
+            src="/img/logos/react-logo.png"
+          />
+          <div
+            class="logo-text-wrapper"
+          >
+            React.js
+          </div>
+        </div>
+        <div
+          class="semantic logo-container"
+        >
+          <img
+            src="/img/logos/semantic-ui-logo.png"
+          />
+          <div
+            class="logo-text-wrapper"
+          >
+            Semantic-UI-React
+          </div>
+        </div>
+      </div>
+      <div
+        class="tech-text-wrapper"
+      >
+        Back-end tech stack
+      </div>
+      <div
+        class="back-end logos-container"
+      >
+        <div
+          class="nodejs logo-container"
+        >
+          <img
+            src="/img/logos/nodejs-logo2.png"
+          />
+          <div
+            class="logo-text-wrapper"
+          >
+            Node.js
+          </div>
+        </div>
+        <div
+          class="express logo-container"
+        >
+          <img
+            src="/img/logos/expressjs-logo2.png"
+          />
+          <div
+            class="logo-text-wrapper"
+          >
+            Express.js
+          </div>
+        </div>
+        <div
+          class="mongodb logo-container"
+        >
+          <img
+            src="/img/logos/mongodb-logo.png"
+          />
+          <div
+            class="logo-text-wrapper"
+          >
+            MongoDB
+          </div>
+        </div>
+      </div>
+      <div
+        class="tech-text-wrapper"
+      >
+        API
+      </div>
+      <div
+        class="api logos-container"
+      >
+        <div
+          class="quandl logo-container"
+        >
+          <img
+            src="/img/logos/quandl-logo.png"
+          />
+          <div
+            class="logo-text-wrapper"
+          >
+            Quandl
+          </div>
+        </div>
+      </div>
+      <div
+        class="tech-text-wrapper"
+      >
+        Key modules
+      </div>
+      <div
+        class="modules logos-container"
+      >
+        <div
+          class="socketio logo-container"
+        >
+          <img
+            src="/img/logos/socketio-logo.gif"
+          />
+          <div
+            class="logo-text-wrapper"
+          >
+            Socket.io
+          </div>
+        </div>
+        <div
+          class="highcharts logo-container"
+        >
+          <img
+            src="/img/logos/highcharts-logo.png"
+          />
+          <div
+            class="logo-text-wrapper"
+          >
+            Highcharts
+          </div>
+        </div>
+      </div>
+      <div>
+        Logo made with
+        <a
+          href="https://www.designevo.com/"
+          title="Free Online Logo Maker"
+        >
+          DesignEvo
+        </a>
+      </div>
+    </div>
+  </div>
+  <div
+    class="arrow"
+  >
+    &gt;
+  </div>
+  <div
+    class="footer"
+  >
+    <a
+      class="footer-item"
+      href="https://hongyi0220.github.io"
+    >
+      yung
+    </a>
+    <hr />
+    <a
+      class="footer-item"
+      href="https://github.com/hongyi0220/stock-chart"
+    >
+      repo
+    </a>
+  </div>
+</div>
+`;
