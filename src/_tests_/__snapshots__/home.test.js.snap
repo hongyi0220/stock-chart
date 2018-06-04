@@ -1,0 +1,220 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Home renders 1`] = `
+<Home
+  isSidebarOn={false}
+>
+  <div
+    className="home-page-container"
+  >
+    <div
+      className="logo-wrapper"
+    >
+      <img
+        onClick={[Function]}
+        src="/img/logo2.png"
+      />
+    </div>
+    <div
+      className="view-chart-container"
+      onClick={[Function]}
+    >
+      <img
+        src="/img/line-chart2.png"
+      />
+      <div
+        className="view-chart-text-wrapper"
+      >
+        View Chart
+      </div>
+    </div>
+    <Sidebar
+      isSidebarOn={false}
+    >
+      <Sidebar
+        animation="overlay"
+        direction="left"
+        visible={false}
+        width="wide"
+      >
+        <div
+          className="ui overlay left wide sidebar"
+        >
+          <div
+            className="about-this-app-container"
+          >
+            <div
+              className="about-text-wrapper"
+            >
+              About This App
+            </div>
+            <div
+              className="tech-text-wrapper"
+            >
+              Front-end tech stack
+            </div>
+            <div
+              className="front-end logos-container"
+            >
+              <div
+                className="react logo-container"
+              >
+                <img
+                  src="/img/logos/react-logo.png"
+                />
+                <div
+                  className="logo-text-wrapper"
+                >
+                  React.js
+                </div>
+              </div>
+              <div
+                className="semantic logo-container"
+              >
+                <img
+                  src="/img/logos/semantic-ui-logo.png"
+                />
+                <div
+                  className="logo-text-wrapper"
+                >
+                  Semantic-UI-React
+                </div>
+              </div>
+            </div>
+            <div
+              className="tech-text-wrapper"
+            >
+              Back-end tech stack
+            </div>
+            <div
+              className="back-end logos-container"
+            >
+              <div
+                className="nodejs logo-container"
+              >
+                <img
+                  src="/img/logos/nodejs-logo2.png"
+                />
+                <div
+                  className="logo-text-wrapper"
+                >
+                  Node.js
+                </div>
+              </div>
+              <div
+                className="express logo-container"
+              >
+                <img
+                  src="/img/logos/expressjs-logo2.png"
+                />
+                <div
+                  className="logo-text-wrapper"
+                >
+                  Express.js
+                </div>
+              </div>
+              <div
+                className="mongodb logo-container"
+              >
+                <img
+                  src="/img/logos/mongodb-logo.png"
+                />
+                <div
+                  className="logo-text-wrapper"
+                >
+                  MongoDB
+                </div>
+              </div>
+            </div>
+            <div
+              className="tech-text-wrapper"
+            >
+              API
+            </div>
+            <div
+              className="api logos-container"
+            >
+              <div
+                className="quandl logo-container"
+              >
+                <img
+                  src="/img/logos/quandl-logo.png"
+                />
+                <div
+                  className="logo-text-wrapper"
+                >
+                  Quandl
+                </div>
+              </div>
+            </div>
+            <div
+              className="tech-text-wrapper"
+            >
+              Key modules
+            </div>
+            <div
+              className="modules logos-container"
+            >
+              <div
+                className="socketio logo-container"
+              >
+                <img
+                  src="/img/logos/socketio-logo.gif"
+                />
+                <div
+                  className="logo-text-wrapper"
+                >
+                  Socket.io
+                </div>
+              </div>
+              <div
+                className="highcharts logo-container"
+              >
+                <img
+                  src="/img/logos/highcharts-logo.png"
+                />
+                <div
+                  className="logo-text-wrapper"
+                >
+                  Highcharts
+                </div>
+              </div>
+            </div>
+            <div>
+              Logo made with
+              <a
+                href="https://www.designevo.com/"
+                title="Free Online Logo Maker"
+              >
+                DesignEvo
+              </a>
+            </div>
+          </div>
+        </div>
+      </Sidebar>
+    </Sidebar>
+    <div
+      className="arrow"
+    >
+      &gt;
+    </div>
+    <div
+      className="footer"
+    >
+      <a
+        className="footer-item"
+        href="https://hongyi0220.github.io"
+      >
+        yung
+      </a>
+      <hr />
+      <a
+        className="footer-item"
+        href="https://github.com/hongyi0220/stock-chart"
+      >
+        repo
+      </a>
+    </div>
+  </div>
+</Home>
+`;
