@@ -80,6 +80,5 @@ MongoClient.connect(dbUrl, (err, db) => {// eslint-disable-line no-unused-vars
       });
     });
   })();
+  http.listen(port);
 });
-
-http.listen(port);
