@@ -3,7 +3,7 @@ const extractSass = new ExtractTextPlugin({ filename: 'app.css' });
 const webpack = require('webpack');
 
 module.exports = {
-    entry: [__dirname + '/src/index.js', __dirname + '/src/styles/app.scss', 'webpack-hot-middleware/client'],
+    entry: [__dirname + '/src/index.js', __dirname + '/src/styles/app.scss', /*'webpack-hot-middleware/client'*/],
     output: {
         path: __dirname + '/build',
         filename: 'index_bundle.js',
