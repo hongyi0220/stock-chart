@@ -8,15 +8,15 @@ const dbUrl = process.env.MONGOLAB_URI;
 const port = process.env.PORT || 3000;
 const io = require('socket.io')(http);
 const bodyParser = require('body-parser');
-const webpack = require('webpack');
-const webpackConfig = require('./webpack/webpack.dev.js');
-const compiler = webpack(webpackConfig);
-
-app.use(require('webpack-dev-middleware')(compiler, {
-  publicPath: webpackConfig.output.publicPath
-}));
-
-app.use(require('webpack-hot-middleware')(compiler));
+// const webpack = require('webpack');
+// const webpackConfig = require('./webpack/webpack.dev.js');
+// const compiler = webpack(webpackConfig);
+//
+// app.use(require('webpack-dev-middleware')(compiler, {
+//   publicPath: webpackConfig.output.publicPath
+// }));
+//
+// app.use(require('webpack-hot-middleware')(compiler));
 
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(bodyParser.json({ limit: '50mb' }));
