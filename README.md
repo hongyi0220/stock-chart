@@ -1,7 +1,7 @@
 Chart the stock market
 =======
 You can build a stock chart by giving it a stock symbol.
-App is live on [heroku](https://stock-chart-0220.herokuapp.com/).
+App is live on [heroku](https://evening-spire-28273.herokuapp.com/).
 
 ## Tech-stack used:
 * **MERN**: **MongoDB**, **Express**, **React** and **Node**.
