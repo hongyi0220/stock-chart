@@ -334,7 +334,7 @@ export default class StockChart extends React.Component {
 
     return (
       <div className='stock-chart-page-container' onClick={this.closeStockInsightCard}>
-        <div className='logo-wrapper' onClick={() => {this.props.history.push('/');}}>
+        <div className='logo-wrapper' onClick={() => {this.props.history.push('/'); window.location.reload(false);}}>
             <img className='back-arrow' src='/img/back-arrow.png' alt='go back'/>
         </div>
         <div className='chart-container'></div>
