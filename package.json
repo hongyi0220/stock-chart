@@ -2,7 +2,8 @@
   "name": "stock-chart",
   "version": "1.0.0",
   "engines": {
-    "node": "8.11.1"
+    "node": "8.11.1",
+    "npm": "5.6.0"
   },
   "description": "A stock chart powered by websockets.",
   "main": "./server.js",
